@@ -30,8 +30,13 @@ using cuda_async_view_mr = rmm::mr::cuda_async_view_memory_resource;
 TEST(PoolTest, UsePool)
 {
   cudaMemPool_t memPool{};
+#ifdef MGPU_BUILD
+  RMM_CUDA_TRY(cudaDeviceGetDefaultMemPool(
+    &memPool, rmm::detail::current_device().value()));
+#else
   RMM_CUDA_TRY(rmm::detail::async_alloc::cudaDeviceGetDefaultMemPool(
     &memPool, rmm::detail::current_device().value()));
+#else
 
   const auto pool_init_size{100};
   cuda_async_view_mr mr{memPool};
@@ -49,7 +54,11 @@ TEST(PoolTest, NotTakingOwnershipOfPool)
 
   cudaMemPool_t memPool{};
 
+#ifdef MGPU_BUILD
+  RMM_CUDA_TRY(cudaMemPoolCreate(&memPool, &poolProps));
+#else
   RMM_CUDA_TRY(rmm::detail::async_alloc::cudaMemPoolCreate(&memPool, &poolProps));
+#endif
 
   {
     const auto pool_init_size{100};
@@ -60,7 +69,11 @@ TEST(PoolTest, NotTakingOwnershipOfPool)
   }
 
   auto destroy_valid_pool = [&]() {
+#ifdef MGPU_BUILD
+    auto result = cudaMemPoolDestroy(memPool);
+#else
     auto result = rmm::detail::async_alloc::cudaMemPoolDestroy(memPool);
+#endif
     RMM_EXPECTS(result == cudaSuccess, "Pool wrapper did destroy pool");
   };
 

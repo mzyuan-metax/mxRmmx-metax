@@ -1,0 +1,22 @@
+The mxRMMX project is modified from rmm (https://github.com/rapidsai/rmm).
+Please see the LICENSE for the license for this project.
+
+This project contains third-party components with separate copyright notices and license terms. Your use of the source code for the these third-party components are subject to the terms and conditions of their licenses. 
+
+
+The following files may have been modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. in 2025. Modification copyright 2025 MetaX Integrated Circuits (Shanghai) Co.,Ltd.
+- include/rmm/detail/dynamic_load_runtime.hpp
+- include/rmm/detail/stack_trace.hpp
+- include/rmm/exec_policy.hpp
+- include/rmm/logger.hpp
+- include/rmm/mr/device/callback_memory_resource.hpp
+- include/rmm/mr/device/cuda_async_memory_resource.hpp
+- include/rmm/mr/device/cuda_async_view_memory_resource.hpp
+- include/rmm/mr/device/logging_resource_adaptor.hpp
+- include/rmm/thrust_rmm_allocator.h
+- python/rmmx/_cuda/gpu.py
+- scripts/run-cmake-format.sh
+
+The following files are newly added by MetaX Integrated Circuits (Shanghai) Co., Ltd. in 2025. All Rights Reserved. 
+- python/rmmx/_cuda/runtime.pyx
+- python/rmmx/_lib/torch_allocator.pyx

@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2018-2021, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +30,11 @@
 
 namespace rmm {
 
-using par_t         = decltype(thrust::cuda::par(*(new rmm::mr::thrust_allocator<char>())));
+#ifdef MGPU_BUILD
+  using par_t         = decltype(thrust::mc::par(*(new rmm::mr::thrust_allocator<char>())));
+#else
+  using par_t         = decltype(thrust::cuda::par(*(new rmm::mr::thrust_allocator<char>())));
+#endif
 using deleter_t     = std::function<void(par_t*)>;
 using exec_policy_t = std::unique_ptr<par_t, deleter_t>;
 

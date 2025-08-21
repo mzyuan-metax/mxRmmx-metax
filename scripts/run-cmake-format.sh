@@ -1,4 +1,7 @@
 #!/bin/bash
+# 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+
+
 
 # This script is a wrapper for cmakelang that may be used with pre-commit. The
 # wrapping is necessary because RAPIDS libraries split configuration for
@@ -15,7 +18,7 @@
 # and exits gracefully if the file is not found. If a user wishes to specify a
 # config file at a nonstandard location, they may do so by setting the
 # environment variable RAPIDS_CMAKE_FORMAT_FILE.
-# 
+#
 # This script can be invoked directly anywhere within the project repository.
 # Alternatively, it may be invoked as a pre-commit hook via
 # `pre-commit run (cmake-format)|(cmake-lint)`.

@@ -12,6 +12,7 @@
 # the License.
 # =============================================================================
 
+set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "ON" FORCE)
 cmake_minimum_required(VERSION 3.23.1 FATAL_ERROR)
 
 set(rmm_version 23.02.00)
@@ -30,7 +31,7 @@ project(
             C CXX)
 
 option(FIND_RMM_CPP "Search for existing RMM C++ installations before defaulting to local files"
-       OFF)
+       ON)
 option(RMM_BUILD_WHEELS "Whether this build is generating a Python wheel." OFF)
 
 # If the user requested it we attempt to find RMM.
@@ -39,6 +40,7 @@ if(FIND_RMM_CPP)
 else()
   set(rmm_FOUND OFF)
 endif()
+
 
 if(NOT rmm_FOUND)
   set(BUILD_TESTS OFF)
@@ -58,5 +60,12 @@ endif()
 include(rapids-cython)
 rapids_cython_init()
 
-add_subdirectory(rmm/_cuda)
-add_subdirectory(rmm/_lib)
+if(DEFINED ENV{MACA_PATH})
+  set(CUBRIDGE_PATH $ENV{MACA_PATH}/tools/cu-bridge)
+  set(MC_RUNTIME_PATH $ENV{MACA_PATH}/lib)
+else()
+  message(FATAL_ERROR "Please set env parameter MACA_PATH")
+endif()
+
+add_subdirectory(rmmx/_cuda)
+add_subdirectory(rmmx/_lib)

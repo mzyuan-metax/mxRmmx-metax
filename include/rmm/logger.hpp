@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2020-2021, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,7 +61,7 @@ struct logger_wrapper {
                 default_log_filename(), true  // truncate file
                 )}
   {
-    logger_.set_pattern("[%6t][%H:%M:%S:%f][%-6l] %v");
+    // logger_.set_pattern("[%6t][%H:%M:%S:%f][%-6l] %v");
     logger_.flush_on(spdlog::level::warn);
 #if SPDLOG_ACTIVE_LEVEL <= SPDLOG_LEVEL_INFO
 #ifdef CUDA_API_PER_THREAD_DEFAULT_STREAM

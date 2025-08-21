@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2022, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -113,8 +118,8 @@ class callback_memory_resource final : public device_memory_resource {
     throw std::runtime_error("cannot get free / total memory");
   }
 
-  [[nodiscard]] virtual bool supports_streams() const noexcept { return false; }
-  [[nodiscard]] virtual bool supports_get_mem_info() const noexcept { return false; }
+  [[nodiscard]] virtual bool supports_streams() const noexcept override { return false; }
+  [[nodiscard]] virtual bool supports_get_mem_info() const noexcept override { return false; }
 
   allocate_callback_t allocate_callback_;
   deallocate_callback_t deallocate_callback_;

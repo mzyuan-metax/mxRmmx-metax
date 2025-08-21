@@ -239,6 +239,11 @@ struct mr_test : public ::testing::TestWithParam<mr_factory> {
                    << "driver/runtime version";
     }
   }
+  void TearDown() override
+  {
+    rmm::mr::set_current_device_resource(nullptr);
+    rmm::detail::available_device_memory();
+  }
 
   std::shared_ptr<rmm::mr::device_memory_resource> mr;  ///< Pointer to resource to use in tests
   rmm::cuda_stream stream{};

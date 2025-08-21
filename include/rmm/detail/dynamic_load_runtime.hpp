@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2022, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,9 +43,14 @@ struct dynamic_load_runtime {
     auto close_cudart = [](void* handle) { ::dlclose(handle); };
     auto open_cudart  = []() {
       ::dlerror();
+#ifdef MGPU_BUILD
+      const std::string libname_ver = "libmcruntime.so.0";
+      const std::string libname     = "libmcruntime.so";
+#else
       const int major               = CUDART_VERSION / 1000;
       const std::string libname_ver = "libcudart.so." + std::to_string(major) + ".0";
       const std::string libname     = "libcudart.so";
+#endif
 
       auto ptr = ::dlopen(libname_ver.c_str(), RTLD_LAZY);
       if (!ptr) { ptr = ::dlopen(libname.c_str(), RTLD_LAZY); }
@@ -81,7 +91,17 @@ struct dynamic_load_runtime {
   }
 // clang-format on
 #else
-#define RMM_CUDART_API_WRAPPER(name, signature)                                \
+#ifdef MGPU_BUILD
+#define RMM_CUDART_API_WRAPPER(name,cppname, signature)                                \
+  template <typename... Args>                                                  \
+  static cudaError_t name(Args... args)                                        \
+  {                                                                            \
+    static const auto func = dynamic_load_runtime::function<signature>(#cppname); \
+    if (func) { return (*func)(args...); }                                     \
+    RMM_FAIL("Failed to find #name function in libcudart.so");                 \
+  }
+#else
+#define RMM_CUDART_API_WRAPPER(name,cppname, signature)                                \
   template <typename... Args>                                                  \
   static cudaError_t name(Args... args)                                        \
   {                                                                            \
@@ -89,6 +109,7 @@ struct dynamic_load_runtime {
     if (func) { return (*func)(args...); }                                     \
     RMM_FAIL("Failed to find #name function in libcudart.so");                 \
   }
+#endif
 #endif
 
 #if CUDART_VERSION >= 11020  // 11.2 introduced cudaMallocAsync
@@ -107,7 +128,11 @@ struct async_alloc {
 #else
     static bool runtime_supports_pool =
       dynamic_load_runtime::function<dynamic_load_runtime::function_sig<void*, cudaStream_t>>(
+#ifdef MGPU_BUILD
+        "wcudaFreeAsync")
+#else
         "cudaFreeAsync")
+#endif
         .has_value();
 #endif
 
@@ -156,22 +181,22 @@ struct async_alloc {
   using cudart_sig = dynamic_load_runtime::function_sig<Args...>;
 
   using cudaMemPoolCreate_sig = cudart_sig<cudaMemPool_t*, const cudaMemPoolProps*>;
-  RMM_CUDART_API_WRAPPER(cudaMemPoolCreate, cudaMemPoolCreate_sig);
+  RMM_CUDART_API_WRAPPER(cudaMemPoolCreate, wcudaMemPoolCreate , cudaMemPoolCreate_sig);
 
   using cudaMemPoolSetAttribute_sig = cudart_sig<cudaMemPool_t, cudaMemPoolAttr, void*>;
-  RMM_CUDART_API_WRAPPER(cudaMemPoolSetAttribute, cudaMemPoolSetAttribute_sig);
+  RMM_CUDART_API_WRAPPER(cudaMemPoolSetAttribute,wcudaMemPoolSetAttribute, cudaMemPoolSetAttribute_sig);
 
   using cudaMemPoolDestroy_sig = cudart_sig<cudaMemPool_t>;
-  RMM_CUDART_API_WRAPPER(cudaMemPoolDestroy, cudaMemPoolDestroy_sig);
+  RMM_CUDART_API_WRAPPER(cudaMemPoolDestroy,wcudaMemPoolDestroy, cudaMemPoolDestroy_sig);
 
   using cudaMallocFromPoolAsync_sig = cudart_sig<void**, size_t, cudaMemPool_t, cudaStream_t>;
-  RMM_CUDART_API_WRAPPER(cudaMallocFromPoolAsync, cudaMallocFromPoolAsync_sig);
+  RMM_CUDART_API_WRAPPER(cudaMallocFromPoolAsync,wcudaMallocFromPoolAsync, cudaMallocFromPoolAsync_sig);
 
   using cudaFreeAsync_sig = cudart_sig<void*, cudaStream_t>;
-  RMM_CUDART_API_WRAPPER(cudaFreeAsync, cudaFreeAsync_sig);
+  RMM_CUDART_API_WRAPPER(cudaFreeAsync,wcudaFreeAsync, cudaFreeAsync_sig);
 
   using cudaDeviceGetDefaultMemPool_sig = cudart_sig<cudaMemPool_t*, int>;
-  RMM_CUDART_API_WRAPPER(cudaDeviceGetDefaultMemPool, cudaDeviceGetDefaultMemPool_sig);
+  RMM_CUDART_API_WRAPPER(cudaDeviceGetDefaultMemPool,wcudaDeviceGetDefaultMemPool, cudaDeviceGetDefaultMemPool_sig);
 };
 #endif
 

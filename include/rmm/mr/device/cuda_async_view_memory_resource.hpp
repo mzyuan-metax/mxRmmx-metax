@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2021, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,8 +123,13 @@ class cuda_async_view_memory_resource final : public device_memory_resource {
     void* ptr{nullptr};
 #ifdef RMM_CUDA_MALLOC_ASYNC_SUPPORT
     if (bytes > 0) {
+#ifdef MGPU_BUILD
+      RMM_CUDA_TRY_ALLOC(cudaMallocFromPoolAsync(
+        &ptr, bytes, pool_handle(), stream.value()));
+#else
       RMM_CUDA_TRY_ALLOC(rmm::detail::async_alloc::cudaMallocFromPoolAsync(
         &ptr, bytes, pool_handle(), stream.value()));
+#endif
     }
 #else
     (void)bytes;
@@ -135,11 +145,15 @@ class cuda_async_view_memory_resource final : public device_memory_resource {
    *
    * @param p Pointer to be deallocated
    */
-  void do_deallocate(void* ptr, std::size_t, rmm::cuda_stream_view stream) override
+  void do_deallocate(void* ptr, std::size_t bytes, rmm::cuda_stream_view stream) override
   {
 #ifdef RMM_CUDA_MALLOC_ASYNC_SUPPORT
     if (ptr != nullptr) {
+#ifdef MGPU_BUILD
+      RMM_ASSERT_CUDA_SUCCESS(cudaFreeAsync(ptr, stream.value()));
+#else
       RMM_ASSERT_CUDA_SUCCESS(rmm::detail::async_alloc::cudaFreeAsync(ptr, stream.value()));
+#endif
     }
 #else
     (void)ptr;

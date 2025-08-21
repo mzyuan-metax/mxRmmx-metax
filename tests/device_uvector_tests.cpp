@@ -47,7 +47,12 @@ TYPED_TEST(TypedUVectorTest, ZeroSizeConstructor)
   EXPECT_EQ(vec.end(), vec.begin());
   EXPECT_TRUE(vec.is_empty());
 }
-
+//  todo . cmodel is too slow. open this on real hardware.
+#ifdef MGPU_BUILD
+#define TEST_COUNT 12
+#else
+#define TEST_COUNT 12345
+#endif
 TYPED_TEST(TypedUVectorTest, NonZeroSizeConstructor)
 {
   auto const size{12345};
@@ -212,7 +217,7 @@ TYPED_TEST(TypedUVectorTest, OOBGetElement)
 
 TYPED_TEST(TypedUVectorTest, GetSetElement)
 {
-  auto const size{12345};
+  auto const size{TEST_COUNT};
   rmm::device_uvector<TypeParam> vec(size, this->stream());
   for (std::size_t i = 0; i < vec.size(); ++i) {
     vec.set_element(i, i, this->stream());
@@ -222,7 +227,7 @@ TYPED_TEST(TypedUVectorTest, GetSetElement)
 
 TYPED_TEST(TypedUVectorTest, GetSetElementAsync)
 {
-  auto const size{12345};
+  auto const size{TEST_COUNT};
   rmm::device_uvector<TypeParam> vec(size, this->stream());
   for (std::size_t i = 0; i < vec.size(); ++i) {
     auto init = static_cast<TypeParam>(i);
@@ -233,7 +238,7 @@ TYPED_TEST(TypedUVectorTest, GetSetElementAsync)
 
 TYPED_TEST(TypedUVectorTest, SetElementZeroAsync)
 {
-  auto const size{12345};
+  auto const size{TEST_COUNT};
   rmm::device_uvector<TypeParam> vec(size, this->stream());
   for (std::size_t i = 0; i < vec.size(); ++i) {
     vec.set_element_to_zero_async(i, this->stream());

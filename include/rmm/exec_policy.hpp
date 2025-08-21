@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2020-2021, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,14 +30,24 @@
 #include <rmm/mr/device/thrust_allocator_adaptor.hpp>
 
 #include <rmm/detail/thrust_namespace.h>
+#ifdef MGPU_BUILD
+#include <thrust/system/mc/execution_policy.h>
+#else
 #include <thrust/system/cuda/execution_policy.h>
+#endif
 #include <thrust/version.h>
 
 namespace rmm {
 
+#ifdef MGPU_BUILD
+using thrust_exec_policy_t =
+  thrust::detail::execute_with_allocator<rmm::mr::thrust_allocator<char>,
+                                         thrust::mc_cub::execute_on_stream_base>;
+#else
 using thrust_exec_policy_t =
   thrust::detail::execute_with_allocator<rmm::mr::thrust_allocator<char>,
                                          thrust::cuda_cub::execute_on_stream_base>;
+#endif
 
 /**
  * @brief Helper class usable as a Thrust CUDA execution policy
@@ -43,7 +58,11 @@ class exec_policy : public thrust_exec_policy_t {
   explicit exec_policy(cuda_stream_view stream             = cuda_stream_default,
                        rmm::mr::device_memory_resource* mr = mr::get_current_device_resource())
     : thrust_exec_policy_t(
+#ifdef MGPU_BUILD
+        thrust::mc::par(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))
+#else
         thrust::cuda::par(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))
+#endif
   {
   }
 };
@@ -52,7 +71,11 @@ class exec_policy : public thrust_exec_policy_t {
 
 using thrust_exec_policy_nosync_t =
   thrust::detail::execute_with_allocator<rmm::mr::thrust_allocator<char>,
+#ifdef MGPU_BUILD
+                                         thrust::mc_cub::execute_on_stream_nosync_base>;
+#else
                                          thrust::cuda_cub::execute_on_stream_nosync_base>;
+#endif
 /**
  * @brief Helper class usable as a Thrust CUDA execution policy
  * that uses RMM for temporary memory allocation on the specified stream
@@ -65,7 +88,11 @@ class exec_policy_nosync : public thrust_exec_policy_nosync_t {
     cuda_stream_view stream             = cuda_stream_default,
     rmm::mr::device_memory_resource* mr = mr::get_current_device_resource())
     : thrust_exec_policy_nosync_t(
+#ifdef MGPU_BUILD
+        thrust::mc::par_nosync(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))
+#else
         thrust::cuda::par_nosync(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))
+#endif
   {
   }
 };

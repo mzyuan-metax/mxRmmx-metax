@@ -20,13 +20,13 @@ dist/
 rmm.egg-info/
 python/build
 python/*/build
-python/rmm/**/_lib/**/*.cpp
-python/rmm/**/_lib/**/*.h
-python/rmm/**/_lib/.nfs*
-python/rmm/_cuda/*.cpp
-python/rmm/tests/*.cpp
-python/rmm/*.ipynb
-python/rmm/.ipynb_checkpoints
+python/rmmx/**/_lib/**/*.cpp
+python/rmmx/**/_lib/**/*.h
+python/rmmx/**/_lib/.nfs*
+python/rmmx/_cuda/*.cpp
+python/rmmx/tests/*.cpp
+python/rmmx/*.ipynb
+python/rmmx/.ipynb_checkpoints
 python/*/record.txt
 python/record.txt
 .Python
@@ -48,7 +48,7 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Ignore dynamically generated .pxd files
-python/rmm/_cuda/gpu.pxd
+python/rmmx/_cuda/gpu.pxd
 
 # Ignore _skbuild directory
 _skbuild/

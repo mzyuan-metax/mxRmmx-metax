@@ -18,7 +18,7 @@ ARGS=$*
 # script, and that this script resides in the repo dir!
 REPODIR=$(cd $(dirname $0); pwd)
 
-VALIDARGS="clean librmm rmm -v -g -n -s --ptds -h tests benchmarks"
+VALIDARGS="clean librmm rmm -v -g -n -m -s --ptds -h tests benchmarks"
 HELP="$0 [clean] [librmm] [rmm] [-v] [-g] [-n] [-s] [--ptds] [--cmake-args=\"<args>\"] [-h]
    clean                       - remove all existing build artifacts and configuration (start over)
    librmm                      - build and install the librmm C++ code
@@ -28,6 +28,7 @@ HELP="$0 [clean] [librmm] [rmm] [-v] [-g] [-n] [-s] [--ptds] [--cmake-args=\"<ar
    -v                          - verbose build mode
    -g                          - build for debug
    -n                          - no install step
+   -m                          - build for MGPU
    -s                          - statically link against cudart
    --ptds                      - enable per-thread default stream
    --cmake-args=\\\"<args>\\\" - pass arbitrary list of CMake configuration options (escape all quotes in argument)
@@ -88,14 +89,27 @@ function ensureCMakeRan {
     mkdir -p "${LIBRMM_BUILD_DIR}"
     if (( RAN_CMAKE == 0 )); then
         echo "Executing cmake for librmm..."
-        cmake -B "${LIBRMM_BUILD_DIR}" -S . \
-              -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
-              -DCUDA_STATIC_RUNTIME="${CUDA_STATIC_RUNTIME}" \
-              -DPER_THREAD_DEFAULT_STREAM="${PER_THREAD_DEFAULT_STREAM}" \
-              -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-              -DBUILD_TESTS=${BUILD_TESTS} \
-              -DBUILD_BENCHMARKS=${BUILD_BENCHMARKS} \
-              ${EXTRA_CMAKE_ARGS}
+        if hasArg -m; then
+            cmake -B "${LIBRMM_BUILD_DIR}" -S . \
+                -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
+                -DCUDA_STATIC_RUNTIME="${CUDA_STATIC_RUNTIME}" \
+                -DPER_THREAD_DEFAULT_STREAM="${PER_THREAD_DEFAULT_STREAM}" \
+                -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+                -DBUILD_TESTS=${BUILD_TESTS} \
+                -DBUILD_BENCHMARKS=${BUILD_BENCHMARKS} \
+                -DMGPU_BUILD=ON \
+                ${EXTRA_CMAKE_ARGS}
+        else
+            cmake -B "${LIBRMM_BUILD_DIR}" -S . \
+                -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
+                -DCUDA_STATIC_RUNTIME="${CUDA_STATIC_RUNTIME}" \
+                -DPER_THREAD_DEFAULT_STREAM="${PER_THREAD_DEFAULT_STREAM}" \
+                -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+                -DBUILD_TESTS=${BUILD_TESTS} \
+                -DBUILD_BENCHMARKS=${BUILD_BENCHMARKS} \
+                ${EXTRA_CMAKE_ARGS}
+        fi
         RAN_CMAKE=1
     fi
 }
@@ -139,6 +153,9 @@ if hasArg -s; then
 fi
 if hasArg --ptds; then
     PER_THREAD_DEFAULT_STREAM=ON
+fi
+if hasArg -m; then
+    MGPU_BUILD=ON
 fi
 
 # Append `-DFIND_RMM_CPP=ON` to CMAKE_ARGS unless a user specified the option.

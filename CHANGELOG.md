@@ -1,10 +1,69 @@
-# RMM 23.02.00 (Date TBD)
+# RMM 23.02.00 (9 Feb 2023)
 
-Please see https://github.com/rapidsai/rmm/releases/tag/v23.02.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
 
-# RMM 22.12.00 (Date TBD)
+- pre-commit: Update isort version to 5.12.0 ([#1197](https://github.com/rapidsai/rmm/pull/1197)) [@wence-](https://github.com/wence-)
+- Revert &quot;Upgrade to spdlog 1.10 ([#1173)&quot; (#1176](https://github.com/rapidsai/rmm/pull/1173)&quot; (#1176)) [@bdice](https://github.com/bdice)
+- Ensure `UpstreamResourceAdaptor` is not cleared by the Python GC ([#1170](https://github.com/rapidsai/rmm/pull/1170)) [@shwina](https://github.com/shwina)
 
-Please see https://github.com/rapidsai/rmm/releases/tag/v22.12.00a for the latest changes to this development branch.
+## 📖 Documentation
+
+- Fix documentation author ([#1188](https://github.com/rapidsai/rmm/pull/1188)) [@bdice](https://github.com/bdice)
+
+## 🚀 New Features
+
+- Add RMM PyTorch allocator ([#1168](https://github.com/rapidsai/rmm/pull/1168)) [@shwina](https://github.com/shwina)
+
+## 🛠️ Improvements
+
+- Update shared workflow branches ([#1201](https://github.com/rapidsai/rmm/pull/1201)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Fix update-version.sh ([#1199](https://github.com/rapidsai/rmm/pull/1199)) [@raydouglass](https://github.com/raydouglass)
+- Use CTK 118/cp310 branch of wheel workflows ([#1193](https://github.com/rapidsai/rmm/pull/1193)) [@sevagh](https://github.com/sevagh)
+- Update `build.yaml` workflow to reduce verbosity ([#1192](https://github.com/rapidsai/rmm/pull/1192)) [@AyodeAwe](https://github.com/AyodeAwe)
+- Fix `build.yaml` workflow ([#1191](https://github.com/rapidsai/rmm/pull/1191)) [@ajschmidt8](https://github.com/ajschmidt8)
+- add docs_build step ([#1189](https://github.com/rapidsai/rmm/pull/1189)) [@AyodeAwe](https://github.com/AyodeAwe)
+- Upkeep/wheel param cleanup ([#1187](https://github.com/rapidsai/rmm/pull/1187)) [@sevagh](https://github.com/sevagh)
+- Update workflows for nightly tests ([#1186](https://github.com/rapidsai/rmm/pull/1186)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Build CUDA `11.8` and Python `3.10` Packages ([#1184](https://github.com/rapidsai/rmm/pull/1184)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Build wheels alongside conda CI ([#1182](https://github.com/rapidsai/rmm/pull/1182)) [@sevagh](https://github.com/sevagh)
+- Update conda recipes. ([#1180](https://github.com/rapidsai/rmm/pull/1180)) [@bdice](https://github.com/bdice)
+- Update PR Workflow ([#1174](https://github.com/rapidsai/rmm/pull/1174)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Upgrade to spdlog 1.10 ([#1173](https://github.com/rapidsai/rmm/pull/1173)) [@kkraus14](https://github.com/kkraus14)
+- Enable `codecov` ([#1171](https://github.com/rapidsai/rmm/pull/1171)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add support for Python 3.10. ([#1166](https://github.com/rapidsai/rmm/pull/1166)) [@bdice](https://github.com/bdice)
+- Update pre-commit hooks ([#1154](https://github.com/rapidsai/rmm/pull/1154)) [@bdice](https://github.com/bdice)
+
+# RMM 22.12.00 (8 Dec 2022)
+
+## 🐛 Bug Fixes
+
+- Don&#39;t use CMake 3.25.0 as it has a show stopping FindCUDAToolkit bug ([#1162](https://github.com/rapidsai/rmm/pull/1162)) [@robertmaynard](https://github.com/robertmaynard)
+- Relax test for async memory pool IPC handle support ([#1130](https://github.com/rapidsai/rmm/pull/1130)) [@bdice](https://github.com/bdice)
+
+## 📖 Documentation
+
+- Use rapidsai CODE_OF_CONDUCT.md ([#1159](https://github.com/rapidsai/rmm/pull/1159)) [@bdice](https://github.com/bdice)
+- Fix doxygen formatting for set_stream. ([#1153](https://github.com/rapidsai/rmm/pull/1153)) [@bdice](https://github.com/bdice)
+- Document required Python dependencies to build from source ([#1146](https://github.com/rapidsai/rmm/pull/1146)) [@ccoulombe](https://github.com/ccoulombe)
+- fix failed automerge (Branch 22.12 merge 22.10) ([#1131](https://github.com/rapidsai/rmm/pull/1131)) [@harrism](https://github.com/harrism)
+
+## 🚀 New Features
+
+- Add wheel builds to rmm ([#1148](https://github.com/rapidsai/rmm/pull/1148)) [@vyasr](https://github.com/vyasr)
+
+## 🛠️ Improvements
+
+- Align __version__ with wheel version ([#1161](https://github.com/rapidsai/rmm/pull/1161)) [@sevagh](https://github.com/sevagh)
+- Add `ninja` &amp; Update CI environment variables ([#1155](https://github.com/rapidsai/rmm/pull/1155)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Remove CUDA 11.0 from dependencies.yaml. ([#1152](https://github.com/rapidsai/rmm/pull/1152)) [@bdice](https://github.com/bdice)
+- Update dependencies schema. ([#1147](https://github.com/rapidsai/rmm/pull/1147)) [@bdice](https://github.com/bdice)
+- Enable sccache for python build ([#1145](https://github.com/rapidsai/rmm/pull/1145)) [@Ethyling](https://github.com/Ethyling)
+- Remove Jenkins scripts ([#1143](https://github.com/rapidsai/rmm/pull/1143)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Use `ninja` in GitHub Actions ([#1142](https://github.com/rapidsai/rmm/pull/1142)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Switch to using rapids-cmake for gbench. ([#1139](https://github.com/rapidsai/rmm/pull/1139)) [@vyasr](https://github.com/vyasr)
+- Remove stale labeler ([#1137](https://github.com/rapidsai/rmm/pull/1137)) [@raydouglass](https://github.com/raydouglass)
+- Add a public `copy` API to `DeviceBuffer` ([#1128](https://github.com/rapidsai/rmm/pull/1128)) [@galipremsagar](https://github.com/galipremsagar)
+- Format gdb script. ([#1127](https://github.com/rapidsai/rmm/pull/1127)) [@bdice](https://github.com/bdice)
 
 # RMM 22.10.00 (12 Oct 2022)
 
@@ -140,7 +199,7 @@ Please see https://github.com/rapidsai/rmm/releases/tag/v22.12.00a for the lates
 
 ## 🐛 Bug Fixes
 
-- Use numba to get CUDA runtime version. ([#946](https://github.com/rapidsai/rmm/pull/946)) [@bdice](https://github.com/bdice)
+- Use numbax to get CUDA runtime version. ([#946](https://github.com/rapidsai/rmm/pull/946)) [@bdice](https://github.com/bdice)
 - Temporarily disable warnings for unknown pragmas ([#942](https://github.com/rapidsai/rmm/pull/942)) [@harrism](https://github.com/harrism)
 - Build benchmarks in RMM CI ([#941](https://github.com/rapidsai/rmm/pull/941)) [@harrism](https://github.com/harrism)
 - Headers that use `std::thread` now include &lt;thread&gt; ([#938](https://github.com/rapidsai/rmm/pull/938)) [@robertmaynard](https://github.com/robertmaynard)

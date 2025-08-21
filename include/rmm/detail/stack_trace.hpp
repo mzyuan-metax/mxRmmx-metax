@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2020-2021, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,9 +67,9 @@ class stack_trace {
   friend std::ostream& operator<<(std::ostream& os, const stack_trace& trace)
   {
 #if defined(RMM_ENABLE_STACK_TRACES)
-    std::unique_ptr<char*, decltype(&::free)> strings(
+    std::unique_ptr<char*, decltype(&::std::free)> strings(
       backtrace_symbols(trace.stack_ptrs.data(), static_cast<int>(trace.stack_ptrs.size())),
-      &::free);
+      &::std::free);
 
     RMM_EXPECTS(strings != nullptr, "Unexpected null stack trace symbols");
     // Iterate over the stack pointers converting to a string
@@ -77,8 +82,8 @@ class stack_trace {
         if (dladdr(trace.stack_ptrs[i], &info) != 0) {
           int status = -1;  // Demangle the name. This can occasionally fail
 
-          std::unique_ptr<char, decltype(&::free)> demangled(
-            abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status), &::free);
+          std::unique_ptr<char, decltype(&::std::free)> demangled(
+            abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status), &::std::free);
           // If it fails, fallback to the dli_name.
           if (status == 0 or (info.dli_sname != nullptr)) {
             auto const* name = status == 0 ? demangled.get() : info.dli_sname;

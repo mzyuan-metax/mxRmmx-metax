@@ -1,4 +1,9 @@
 /*
+ * 2025 - Modified by MetaX Integrated Circuits (Shanghai) Co., Ltd. All Rights Reserved.
+ */
+
+
+/*
  * Copyright (c) 2021-2022, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -100,7 +105,11 @@ class cuda_async_memory_resource final : public device_memory_resource {
     pool_props.location.type = cudaMemLocationTypeDevice;
     pool_props.location.id   = rmm::detail::current_device().value();
     cudaMemPool_t cuda_pool_handle{};
+#ifdef MGPU_BUILD
+    RMM_CUDA_TRY(cudaMemPoolCreate(&cuda_pool_handle, &pool_props));
+#else
     RMM_CUDA_TRY(rmm::detail::async_alloc::cudaMemPoolCreate(&cuda_pool_handle, &pool_props));
+#endif
     pool_ = cuda_async_view_memory_resource{cuda_pool_handle};
 
     // CUDA drivers before 11.5 have known incompatibilities with the async allocator.
@@ -111,16 +120,26 @@ class cuda_async_memory_resource final : public device_memory_resource {
     constexpr auto min_async_version{11050};
     if (driver_version < min_async_version) {
       int disabled{0};
+#ifdef MGPU_BUILD
+      RMM_CUDA_TRY(cudaMemPoolSetAttribute(
+        pool_handle(), cudaMemPoolReuseAllowOpportunistic, &disabled));
+#else
       RMM_CUDA_TRY(rmm::detail::async_alloc::cudaMemPoolSetAttribute(
         pool_handle(), cudaMemPoolReuseAllowOpportunistic, &disabled));
+#endif
     }
 
     auto const [free, total] = rmm::detail::available_device_memory();
 
     // Need an l-value to take address to pass to cudaMemPoolSetAttribute
     uint64_t threshold = release_threshold.value_or(total);
+#ifdef MGPU_BUILD
+    RMM_CUDA_TRY(cudaMemPoolSetAttribute(
+      pool_handle(), cudaMemPoolAttrReleaseThreshold, &threshold));
+#else
     RMM_CUDA_TRY(rmm::detail::async_alloc::cudaMemPoolSetAttribute(
       pool_handle(), cudaMemPoolAttrReleaseThreshold, &threshold));
+#endif
 
     // Allocate and immediately deallocate the initial_pool_size to prime the pool with the
     // specified size
@@ -144,7 +163,11 @@ class cuda_async_memory_resource final : public device_memory_resource {
   ~cuda_async_memory_resource() override
   {
 #if defined(RMM_CUDA_MALLOC_ASYNC_SUPPORT)
+#ifdef MGPU_BUILD
+    RMM_ASSERT_CUDA_SUCCESS(cudaMemPoolDestroy(pool_handle()));
+#else
     RMM_ASSERT_CUDA_SUCCESS(rmm::detail::async_alloc::cudaMemPoolDestroy(pool_handle()));
+#endif
 #endif
   }
   cuda_async_memory_resource(cuda_async_memory_resource const&) = delete;
