@@ -105,3 +105,10 @@ Attached GPUs                                     : 1
 +---------------------------------------------------------------------------------+
 
 ```
+
+### 8. Build Wheel Package
+
+```
+$ cd python
+$ python setup.py bdist_wheel
+```
