@@ -123,7 +123,7 @@ class cuda_async_view_memory_resource final : public device_memory_resource {
     void* ptr{nullptr};
 #ifdef RMM_CUDA_MALLOC_ASYNC_SUPPORT
     if (bytes > 0) {
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
       RMM_CUDA_TRY_ALLOC(cudaMallocFromPoolAsync(
         &ptr, bytes, pool_handle(), stream.value()));
 #else
@@ -149,7 +149,7 @@ class cuda_async_view_memory_resource final : public device_memory_resource {
   {
 #ifdef RMM_CUDA_MALLOC_ASYNC_SUPPORT
     if (ptr != nullptr) {
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
       RMM_ASSERT_CUDA_SUCCESS(cudaFreeAsync(ptr, stream.value()));
 #else
       RMM_ASSERT_CUDA_SUCCESS(rmm::detail::async_alloc::cudaFreeAsync(ptr, stream.value()));

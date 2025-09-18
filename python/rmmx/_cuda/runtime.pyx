@@ -14,7 +14,7 @@ include '_runtime_extern.pxi'
 
 
 @cython.embedsignature(True)
-def pmcGetErrorName(error : Error_t):
+def phcGetErrorName(error : Error_t):
     """ Returns the string representation of an error code enum name.
 
     Returns a string containing the name of an error code in the enum. If
@@ -35,11 +35,11 @@ def pmcGetErrorName(error : Error_t):
 
 
     """
-    err = mcGetErrorName(<Error>error)
+    err = hcGetErrorName(<Error>error)
     return (Error_t.cudaSuccess, err)
 
 @cython.embedsignature(True)
-def pmcGetErrorString(error : Error_t):
+def phcGetErrorString(error : Error_t):
     """ Returns the description string for an error code.
 
     Returns the description string for an error code. If the error code is
@@ -58,18 +58,18 @@ def pmcGetErrorString(error : Error_t):
         None
 
     """
-    err = mcGetErrorString(<Error>error)
+    err = hcGetErrorString(<Error>error)
     return (Error_t.cudaSuccess, err)
 
 
 
 @cython.embedsignature(True)
-def pmcDriverGetVersion():
-    """ Returns the latest version of MGPU supported by the driver.
+def phcDriverGetVersion():
+    """ Returns the latest version of HGPU supported by the driver.
 
-    Returns in `*driverVersion` the latest version of MGPU supported by the
+    Returns in `*driverVersion` the latest version of HGPU supported by the
     driver. The version is returned as (1000 * major + 10 * minor). For
-    example, MGPU 9.2 would be represented by 9020. If no driver is
+    example, HGPU 9.2 would be represented by 9020. If no driver is
     installed, then 0 is returned as the driver version.
 
     This function automatically returns cudaErrorInvalidValue if
@@ -89,12 +89,12 @@ def pmcDriverGetVersion():
     cuDriverGetVersion
     """
     cdef int driverVersion = 0
-    err = mcDriverGetVersion(&driverVersion)
+    err = hcDriverGetVersion(&driverVersion)
     return (Error_t(err), driverVersion)
 
 
 @cython.embedsignature(True)
-def pmcGetDeviceCount():
+def phcGetDeviceCount():
     """ Returns the number of compute-capable devices.
 
     Returns in `*count` the number of devices with compute capability
@@ -112,11 +112,11 @@ def pmcGetDeviceCount():
 
     """
     cdef int count = 0
-    err = mcGetDeviceCount(&count)
+    err = hcGetDeviceCount(&count)
     return (Error_t(err), count)
 
 @cython.embedsignature(True)
-def pmcGetDevice():
+def phcGetDevice():
     """ Returns which device is currently being used.
 
     Returns in `*device` the current device for the calling host thread.
@@ -132,11 +132,11 @@ def pmcGetDevice():
 
     """
     cdef int device = 0
-    err = mcGetDevice(&device)
+    err = hcGetDevice(&device)
     return (Error_t(err), device)
 
 @cython.embedsignature(True)
-def pmcSetDevice(int device):
+def phcSetDevice(int device):
     """ Set device to be used for GPU executions.
     Parameters
     ----------
@@ -155,12 +155,12 @@ def pmcSetDevice(int device):
 
 
     """
-    err = mcSetDevice(device)
+    err = hcSetDevice(device)
     return (Error_t(err),)
 
 
 @cython.embedsignature(True)
-def pmcDeviceGetName(int length, int device_id):
+def phcDeviceGetName(int length, int device_id):
     """ Returns an identifer string for the device.
 
     Returns an ASCII string identifying the device `dev` in the NULL-
@@ -181,11 +181,11 @@ def pmcDeviceGetName(int length, int device_id):
 
     """
     cdef char* name = <char*>calloc(1, length)
-    err = mcDeviceGetName(name, length, device_id)
+    err = hcDeviceGetName(name, length, device_id)
     return (Error_t(err), <bytes>name)
 
 #@cython.embedsignature(True)
-def pmcDeviceGetAttribute(attr , int device):
+def phcDeviceGetAttribute(attr , int device):
     """ Returns information about the device.
 
     Parameters
@@ -208,12 +208,12 @@ def pmcDeviceGetAttribute(attr , int device):
     """
     cdef int value = 0
     # cdef ccudart.DeviceAttr cattr = attr.value
-    err = mcDeviceGetAttribute(&value, <DeviceAttr>attr.value, device)
+    err = hcDeviceGetAttribute(&value, <DeviceAttr>attr.value, device)
     return (Error_t(err), value)
 
 @cython.embedsignature(True)
-def pmcRuntimeGetVersion():
-    """ Returns the latest version of MGPU supported by the runtime.
+def phcRuntimeGetVersion():
+    """ Returns the latest version of HGPU supported by the runtime.
 
     Returns
     -------
@@ -229,10 +229,10 @@ def pmcRuntimeGetVersion():
     cuDriverGetVersion
     """
     cdef int runtimeVersion = 0
-    err = mcRuntimeGetVersion(&runtimeVersion)
+    err = hcRuntimeGetVersion(&runtimeVersion)
     return (Error_t(err), runtimeVersion)
 
 @cython.embedsignature(True)
-def pmcDeviceSetLimit(limit , int value):
-    err = mcDeviceSetLimit(<MCLimit>limit, value)
+def phcDeviceSetLimit(limit , int value):
+    err = hcDeviceSetLimit(<HCLimit>limit, value)
     return (Error_t(err), )

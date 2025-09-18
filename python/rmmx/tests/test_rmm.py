@@ -79,7 +79,7 @@ _dtypes = [
 _nelems = [1, 2, 7, 8, 9, 32, 128]
 # _allocs = [cuda]
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("dtype", _dtypes)
 # @pytest.mark.parametrize("nelem", _nelems)
 # @pytest.mark.parametrize("alloc", _allocs)
@@ -88,7 +88,7 @@ def test_rmm_alloc(dtype, nelem, alloc):
 
 
 #Test all combinations of default/managed and pooled/non-pooled allocation
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("dtype", _dtypes)
 # @pytest.mark.parametrize("nelem", _nelems)
 # @pytest.mark.parametrize("alloc", _allocs)
@@ -105,7 +105,7 @@ def test_rmm_modes(dtype, nelem, alloc, managed, pool):
 
     array_tester(dtype, nelem, alloc)
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("dtype", _dtypes)
 # @pytest.mark.parametrize("nelem", _nelems)
 # @pytest.mark.parametrize("alloc", _allocs)
@@ -260,7 +260,7 @@ def test_rmm_device_buffer_copy_from_host(hb):
 
     np.testing.assert_equal(expected, result)
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 @pytest.mark.parametrize(
     "cuda_ary",
     [
@@ -300,7 +300,7 @@ def test_rmm_device_buffer_pickle_roundtrip(hb):
         hb3 = db3.tobytes()
         assert hb3 == hb
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("stream", [cuda.default_stream(), cuda.stream()])
 def test_rmm_pool_numba_stream(stream):
     rmmx.reinitialize(pool_allocator=True)
@@ -311,7 +311,7 @@ def test_rmm_pool_numba_stream(stream):
     assert a.size == 3
     assert a.ptr != 0
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 def test_rmm_cupy_allocator():
     cupy = pytest.importorskip("cupy")
 
@@ -329,7 +329,7 @@ def test_rmm_cupy_allocator():
     a = cupy.arange(10)
     assert isinstance(a.data.mem._owner, rmmx.DeviceBuffer)
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("stream", ["null", "async"])
 def test_rmm_pool_cupy_allocator_with_stream(stream):
     cupy = pytest.importorskip("cupy")
@@ -362,7 +362,7 @@ def test_rmm_pool_cupy_allocator_with_stream(stream):
 
     rmmx.reinitialize()
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 def test_rmm_pool_cupy_allocator_stream_lifetime():
     cupy = pytest.importorskip("cupy")
 
@@ -377,7 +377,7 @@ def test_rmm_pool_cupy_allocator_stream_lifetime():
 
     del x
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("dtype", _dtypes)
 # @pytest.mark.parametrize("nelem", _nelems)
 # @pytest.mark.parametrize("alloc", _allocs)
@@ -391,7 +391,7 @@ def test_pool_memory_resource(dtype, nelem, alloc):
     assert rmmx.mr.get_current_device_resource_type() is type(mr)
     array_tester(dtype, nelem, alloc)
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("dtype", _dtypes)
 # @pytest.mark.parametrize("nelem", _nelems)
 # @pytest.mark.parametrize("alloc", _allocs)
@@ -410,7 +410,7 @@ def test_fixed_size_memory_resource(dtype, nelem, alloc, upstream):
     assert rmmx.mr.get_current_device_resource_type() is type(mr)
     array_tester(dtype, nelem, alloc)
 
-@pytest.mark.skipif(1, reason='mgpu not support numba')
+@pytest.mark.skipif(1, reason='hgpu not support numba')
 # @pytest.mark.parametrize("dtype", _dtypes)
 # @pytest.mark.parametrize("nelem", _nelems)
 # @pytest.mark.parametrize("alloc", _allocs)

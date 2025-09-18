@@ -43,9 +43,9 @@ struct dynamic_load_runtime {
     auto close_cudart = [](void* handle) { ::dlclose(handle); };
     auto open_cudart  = []() {
       ::dlerror();
-#ifdef MGPU_BUILD
-      const std::string libname_ver = "libmcruntime.so.0";
-      const std::string libname     = "libmcruntime.so";
+#ifdef HGPU_BUILD
+      const std::string libname_ver = "libhcruntime.so.0";
+      const std::string libname     = "libhcruntime.so";
 #else
       const int major               = CUDART_VERSION / 1000;
       const std::string libname_ver = "libcudart.so." + std::to_string(major) + ".0";
@@ -91,7 +91,7 @@ struct dynamic_load_runtime {
   }
 // clang-format on
 #else
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
 #define RMM_CUDART_API_WRAPPER(name,cppname, signature)                                \
   template <typename... Args>                                                  \
   static cudaError_t name(Args... args)                                        \
@@ -128,7 +128,7 @@ struct async_alloc {
 #else
     static bool runtime_supports_pool =
       dynamic_load_runtime::function<dynamic_load_runtime::function_sig<void*, cudaStream_t>>(
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
         "wcudaFreeAsync")
 #else
         "cudaFreeAsync")

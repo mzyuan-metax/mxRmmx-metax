@@ -2,15 +2,15 @@
 
 # Copyright (c) 2020, NVIDIA CORPORATION.
 
-import numbax.cuda     # remove on mgpu
+import numbax.cuda     # remove on HGPU
 
 from rmmx._cuda import runtime
 
 class CUDARuntimeError(RuntimeError):
     def __init__(self, status: runtime.Error_t):
         self.status = status
-        _, name = runtime.pmcGetErrorString(status)
-        _, msg = runtime.pmcGetErrorString(status)
+        _, name = runtime.phcGetErrorString(status)
+        _, msg = runtime.phcGetErrorString(status)
 
         super(CUDARuntimeError, self).__init__(
             f"{name.decode()}: {msg.decode()}"
@@ -30,7 +30,7 @@ def driverGetVersion():
     This function automatically raises CUDARuntimeError with error message
     and status code.
     """
-    status, version = runtime.pmcDriverGetVersion()
+    status, version = runtime.phcDriverGetVersion()
     if status != runtime.Error_t.cudaSuccess:
         raise CUDARuntimeError(status)
     return version
@@ -40,7 +40,7 @@ def getDevice():
     """
     Get the current CUDA device
     """
-    status, device = runtime.pmcGetDevice()
+    status, device = runtime.phcGetDevice()
     if status != runtime.Error_t.cudaSuccess:
         raise CUDARuntimeError(status)
     return device
@@ -54,7 +54,7 @@ def setDevice(device: int):
     device : int
         The ID of the device to set as current
     """
-    (status,) = runtime.pmcSetDevice(device)
+    (status,) = runtime.phcSetDevice(device)
     if status != runtime.Error_t.cudaSuccess:
         raise CUDARuntimeError(status)
 
@@ -70,7 +70,7 @@ def runtimeGetVersion():
     """
     # TODO: Replace this with `cuda.cudart.cudaRuntimeGetVersion()` when the
     # limitation is fixed.
-    major, minor = numbax.cuda.runtime.get_version()       # no numbax on mgpu
+    major, minor = numbax.cuda.runtime.get_version()       # no numbax on HGPU
     return major * 1000 + minor * 10
 
 
@@ -82,7 +82,7 @@ def getDeviceCount():
     This function automatically raises CUDARuntimeError with error message
     and status code.
     """
-    status, count = runtime.pmcGetDeviceCount()
+    status, count = runtime.phcGetDeviceCount()
     if status != runtime.Error_t.cudaSuccess:
         raise CUDARuntimeError(status)
     return count
@@ -102,7 +102,7 @@ def getDeviceAttribute(attr: runtime.cudaDeviceAttr, device: int):
     This function automatically raises CUDARuntimeError with error message
     and status code.
     """
-    status, value = runtime.pmcDeviceGetAttribute(attr, device)
+    status, value = runtime.phcDeviceGetAttribute(attr, device)
     if status != runtime.Error_t.cudaSuccess:
         raise CUDARuntimeError(status)
     return value
@@ -122,7 +122,7 @@ def getDeviceAttribute(attr: runtime.cudaDeviceAttr, device: int):
 #     and status code.
 #     """
 #     # status, prop = cudart.cudaGetDeviceProperties(device)
-#     status, prop = runtime.pmcGetDeviceProperties(device)
+#     status, prop = runtime.phcGetDeviceProperties(device)
 #     if status != runtime.Error_t.cudaSuccess:
 #         raise CUDARuntimeError(status)
 #     return prop
@@ -141,7 +141,7 @@ def deviceGetName(device: int):
     and status code.
     """
 
-    status, device_name = runtime.pmcDeviceGetName(256, device)
+    status, device_name = runtime.phcDeviceGetName(256, device)
     if status != runtime.Error_t.cudaSuccess:
         raise CUDARuntimeError(status)
     return device_name.decode()

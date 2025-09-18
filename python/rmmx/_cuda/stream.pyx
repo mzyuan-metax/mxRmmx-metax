@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rmmx._cuda.runtime cimport mcStream_t
+from rmmx._cuda.runtime cimport hcStream_t
 from libc.stdint cimport uintptr_t
 from libcpp cimport bool
 
@@ -52,9 +52,9 @@ cdef class Stream:
             self._init_from_cupy_stream(obj)
 
     @staticmethod
-    cdef Stream _from_cudaStream_t(mcStream_t s, object owner=None):
+    cdef Stream _from_cudaStream_t(hcStream_t s, object owner=None):
         """
-        Construct a Stream from a mcStream_t.
+        Construct a Stream from a hcStream_t.
         """
         cdef Stream obj = Stream.__new__(Stream)
         obj._cuda_stream = s
@@ -65,7 +65,7 @@ cdef class Stream:
         """
         Generate a rmm::cuda_stream_view from this Stream instance
         """
-        return cuda_stream_view(<mcStream_t><uintptr_t>(self._cuda_stream))
+        return cuda_stream_view(<hcStream_t><uintptr_t>(self._cuda_stream))
 
     cdef void c_synchronize(self) nogil except *:
         """
@@ -94,14 +94,14 @@ cdef class Stream:
         return self.c_is_default()
 
     def _init_from_numba_stream(self, obj):
-        self._cuda_stream = <mcStream_t><uintptr_t>(int(obj))
+        self._cuda_stream = <hcStream_t><uintptr_t>(int(obj))
         self._owner = obj
 
     def _init_from_cupy_stream(self, obj):
-        try:           # remove on mgpu
+        try:           # remove on HGPU
             import cupy
             if isinstance(obj, cupy.cuda.stream.Stream):
-                self._cuda_stream = <mcStream_t><uintptr_t>(obj.ptr)
+                self._cuda_stream = <hcStream_t><uintptr_t>(obj.ptr)
                 self._owner = obj
                 return
         except ImportError:

@@ -25,7 +25,7 @@ setup(
     # version=23.02,
     description="rmmx - Memory Manager Extender",
     # url="https://xxx",
-    author="MGPU Corporation",
+    author="HGPU Corporation",
     license="Apache 2.0",
     classifiers=[
         "Intended Audience :: Developers",

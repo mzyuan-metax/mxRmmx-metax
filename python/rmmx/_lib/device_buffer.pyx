@@ -373,7 +373,7 @@ cdef void _copy_async(const void* src,
     """
     Asynchronously copy data between host and/or device pointers.
 
-    This is a convenience wrapper around mcMemcpyAsync that
+    This is a convenience wrapper around hcMemcpyAsync that
     checks for errors. Only used for internal implementation.
 
     Parameters
@@ -384,8 +384,8 @@ cdef void _copy_async(const void* src,
     kind : the kind of copy to perform
     stream : CUDA stream to use for copying, default the default stream
     """
-    cdef int err = mcMemcpyAsync(dst, src, count, kind,
-                                           <MCStream>stream)
+    cdef int err = hcMemcpyAsync(dst, src, count, kind,
+                                           <HCStream>stream)
 
     if err != 0:
         raise RuntimeError(f"Memcpy failed with error: {err}")
@@ -427,7 +427,7 @@ cpdef void copy_ptr_to_host(uintptr_t db,
 
     with nogil:
         _copy_async(<const void*>db, <void*>&hb[0], len(hb),
-                    <MemoryKind>mcMemcpyDeviceToHost, stream.view())
+                    <MemoryKind>hcMemcpyDeviceToHost, stream.view())
 
     if stream.c_is_default():
         stream.c_synchronize()
@@ -470,7 +470,7 @@ cpdef void copy_host_to_ptr(const unsigned char[::1] hb,
 
     with nogil:
         _copy_async(<const void*>&hb[0], <void*>db, len(hb),
-                    <MemoryKind>mcMemcpyHostToDevice, stream.view())
+                    <MemoryKind>hcMemcpyHostToDevice, stream.view())
 
     if stream.c_is_default():
         stream.c_synchronize()
@@ -503,4 +503,4 @@ cpdef void copy_device_to_ptr(uintptr_t d_src,
 
     with nogil:
         _copy_async(<const void*>d_src, <void*>d_dst, count,
-                    <MemoryKind>mcMemcpyDeviceToDevice, stream.view())
+                    <MemoryKind>hcMemcpyDeviceToDevice, stream.view())

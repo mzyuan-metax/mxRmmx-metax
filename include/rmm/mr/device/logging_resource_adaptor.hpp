@@ -203,8 +203,8 @@ class logging_resource_adaptor final : public device_memory_resource {
     if (auto_flush) { logger_->flush_on(spdlog::level::info); }
     logger_->set_pattern("%v");
     logger_->info(header());
-#ifdef MGPU_BUILD1
-    // mgpu code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
+#ifdef HGPU_BUILD1
+    // HGPU code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
     logger_->info("\n");
 #endif
     logger_->set_pattern("%t,%H:%M:%S.%f,%v");
@@ -240,15 +240,15 @@ class logging_resource_adaptor final : public device_memory_resource {
     try {
       auto const ptr = upstream_->allocate(bytes, stream);
       logger_->info("allocate,{},{},{}", ptr, bytes, fmt::ptr(stream.value()));
-#ifdef MGPU_BUILD1
-      // mgpu code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
+#ifdef HGPU_BUILD1
+      // HGPU code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
       logger_->info("\n");
 #endif
       return ptr;
     } catch (...) {
       logger_->info("allocate failure,{},{},{}", nullptr, bytes, fmt::ptr(stream.value()));
-#ifdef MGPU_BUILD1
-      // mgpu code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
+#ifdef HGPU_BUILD1
+      // HGPU code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
       logger_->info("\n");
 #endif
       throw;
@@ -274,8 +274,8 @@ class logging_resource_adaptor final : public device_memory_resource {
   void do_deallocate(void* ptr, std::size_t bytes, cuda_stream_view stream) override
   {
     logger_->info("free,{},{},{}", ptr, bytes, fmt::ptr(stream.value()));
-#ifdef MGPU_BUILD1
-    // mgpu code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
+#ifdef HGPU_BUILD1
+    // HGPU code chnage spdlog SPDLOG_EOL to "" include/spdlog/tweakme.h +65
     logger_->info("\n");
 #endif
     upstream_->deallocate(ptr, bytes, stream);

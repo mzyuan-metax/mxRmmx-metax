@@ -30,7 +30,7 @@
 #include <rmm/mr/device/thrust_allocator_adaptor.hpp>
 
 #include <rmm/detail/thrust_namespace.h>
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
 #include <thrust/system/mc/execution_policy.h>
 #else
 #include <thrust/system/cuda/execution_policy.h>
@@ -39,7 +39,7 @@
 
 namespace rmm {
 
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
 using thrust_exec_policy_t =
   thrust::detail::execute_with_allocator<rmm::mr::thrust_allocator<char>,
                                          thrust::mc_cub::execute_on_stream_base>;
@@ -58,7 +58,7 @@ class exec_policy : public thrust_exec_policy_t {
   explicit exec_policy(cuda_stream_view stream             = cuda_stream_default,
                        rmm::mr::device_memory_resource* mr = mr::get_current_device_resource())
     : thrust_exec_policy_t(
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
         thrust::mc::par(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))
 #else
         thrust::cuda::par(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))
@@ -71,7 +71,7 @@ class exec_policy : public thrust_exec_policy_t {
 
 using thrust_exec_policy_nosync_t =
   thrust::detail::execute_with_allocator<rmm::mr::thrust_allocator<char>,
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
                                          thrust::mc_cub::execute_on_stream_nosync_base>;
 #else
                                          thrust::cuda_cub::execute_on_stream_nosync_base>;
@@ -88,7 +88,7 @@ class exec_policy_nosync : public thrust_exec_policy_nosync_t {
     cuda_stream_view stream             = cuda_stream_default,
     rmm::mr::device_memory_resource* mr = mr::get_current_device_resource())
     : thrust_exec_policy_nosync_t(
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
         thrust::mc::par_nosync(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))
 #else
         thrust::cuda::par_nosync(rmm::mr::thrust_allocator<char>(stream, mr)).on(stream.value()))

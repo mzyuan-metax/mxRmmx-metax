@@ -44,12 +44,12 @@ set(RMM_LOGGING_LEVEL
 set_property(CACHE RMM_LOGGING_LEVEL PROPERTY STRINGS "TRACE" "DEBUG" "INFO" "WARN" "ERROR"
                                               "CRITICAL" "OFF")
 
-option(MGPU_BUILD "build project on mgpu" ON)
-if(MGPU_BUILD)
-  if(DEFINED ENV{MACA_PATH})
-    set(CUBRIDGE_PATH $ENV{MACA_PATH}/tools/cu-bridge)
+option(HGPU_BUILD "build project on hgpu" ON)
+if(HGPU_BUILD)
+  if(DEFINED ENV{HPCC_PATH})
+    set(CUBRIDGE_PATH $ENV{HPCC_PATH}/tools/cu-bridge)
   else()
-    message(FATAL_ERROR "Please set env parameter MACA_PATH")
+    message(FATAL_ERROR "Please set env parameter HPCC_PATH")
   endif()
 
   if(THRUST_PATH)
@@ -57,14 +57,14 @@ if(MGPU_BUILD)
   elseif(DEFINED ENV{THRUST_PATH})
     set(THRUST_PATH_INC $ENV{THRUST_PATH})
   else()
-    set(THRUST_PATH_INC $ENV{MACA_PATH}/tools/cu-bridge/include)
+    set(THRUST_PATH_INC $ENV{HPCC_PATH}/tools/cu-bridge/include)
   endif()
 
   if(NOT (EXISTS ${THRUST_PATH_INC}))
     message(FATAL_ERROR "THRUST_PATH='${THRUST_PATH_INC}' not exists or not specified")
   endif()
 
-  set(CMAKE_MODULE_PATH="${CUBRIDGE_PATH}/cmake_module/maca")
+  set(CMAKE_MODULE_PATH="${CUBRIDGE_PATH}/cmake_module/hpcc")
 endif()
 # Set logging level. Must go before including gtests and benchmarks. Set the possible values of
 # build type for cmake-gui
@@ -73,7 +73,7 @@ message(STATUS "RMM: RMM_LOGGING_LEVEL = '${RMM_LOGGING_LEVEL}'")
 # cudart can be statically linked or dynamically linked the python ecosystem wants dynamic linking
 option(CUDA_STATIC_RUNTIME "Statically link the CUDA runtime" OFF)
 
-if(NOT MGPU_BUILD)
+if(NOT HGPU_BUILD)
 # find packages we depend on
 rapids_find_package(
   CUDAToolkit REQUIRED
@@ -81,13 +81,13 @@ rapids_find_package(
   INSTALL_EXPORT_SET rmm-exports)
 else()
   set(CUDAToolkit_INCLUDE_DIRS ${CUBRIDGE_PATH}/include/)
-  set(CUDAToolkit_LIBRARY_DIR $ENV{MACA_PATH}/lib)
+  set(CUDAToolkit_LIBRARY_DIR $ENV{HPCC_PATH}/lib)
 endif()
 
 rapids_cpm_init()
 include(cmake/thirdparty/get_spdlog.cmake)
 
-if(NOT MGPU_BUILD)
+if(NOT HGPU_BUILD)
   include(cmake/thirdparty/get_thrust.cmake)
 endif()
 
@@ -98,41 +98,41 @@ add_library(rmm::rmm ALIAS rmm)
 target_include_directories(rmm INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                          "$<INSTALL_INTERFACE:include>")
 
-if(MGPU_BUILD)
+if(HGPU_BUILD)
   target_include_directories(rmm INTERFACE "$<BUILD_INTERFACE:${THRUST_PATH_INC}>"
                                             "$<BUILD_INTERFACE:${CUBRIDGE_PATH}/include>"
                                             "$<BUILD_INTERFACE:${CUBRIDGE_PATH}/include/soft-link>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcc>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcr>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mxc>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcblas>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcfft>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcdnn>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcsolver>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcsparse>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mcrand>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/common>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/include/mctx>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcc>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcr>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/htc>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcblas>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcfft>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcdnn>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcsolver>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcsparse>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hcrand>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/common>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/include/hctx>"
                                             "$<INSTALL_INTERFACE:include>"
                                             "$<INSTALL_INTERFACE:${CUBRIDGE_PATH}/include>"
                                             "$<INSTALL_INTERFACE:${CUBRIDGE_PATH}/include/soft-link>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcc>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcr>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mxc>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcblas>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcfft>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcdnn>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcsolver>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcsparse>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mcrand>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/common>"
-                                            "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/include/mctx>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcc>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcr>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/htc>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcblas>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcfft>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcdnn>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcsolver>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcsparse>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hcrand>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/common>"
+                                            "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/include/hctx>"
                                             )
 endif()
 
-if(NOT MGPU_BUILD)
+if(NOT HGPU_BUILD)
   if(CUDA_STATIC_RUNTIME)
     message(STATUS "RMM: Enabling static linking of cudart")
     target_link_libraries(rmm INTERFACE CUDA::cudart_static)
@@ -141,36 +141,36 @@ if(NOT MGPU_BUILD)
     target_link_libraries(rmm INTERFACE CUDA::cudart)
   endif()
 else()
-  target_link_libraries(rmm INTERFACE mcruntime)
-  target_link_directories(rmm INTERFACE  "$<INSTALL_INTERFACE:$ENV{MACA_PATH}/lib>"
-                                            "$<BUILD_INTERFACE:$ENV{MACA_PATH}/lib>")
+  target_link_libraries(rmm INTERFACE hcruntime)
+  target_link_directories(rmm INTERFACE  "$<INSTALL_INTERFACE:$ENV{HPCC_PATH}/lib>"
+                                            "$<BUILD_INTERFACE:$ENV{HPCC_PATH}/lib>")
 endif()
 
 # target_link_libraries(rmm INTERFACE rmm::Thrust)
 target_link_libraries(rmm INTERFACE spdlog::spdlog_header_only)
 target_link_libraries(rmm INTERFACE dl)
-if(MGPU_BUILD)
+if(HGPU_BUILD)
   target_compile_options(rmm INTERFACE -std=c++17)
   target_compile_features(rmm INTERFACE cxx_std_17)
 else()
   target_compile_features(rmm INTERFACE cxx_std_17 $<BUILD_INTERFACE:cuda_std_17>)
 endif()
 
-if(MGPU_BUILD)
+if(HGPU_BUILD)
   set(CMAKE_CUDA_COMPILER "${CUBRIDGE_PATH}/bin/cucc")
   set(CMAKE_LINKER "${CUBRIDGE_PATH}/bin/cucc")
   set(CMAKE_CUDA_LINK_EXECUTABLE "<CMAKE_LINKER> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
   set(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_LINKER> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 
-  target_compile_definitions(rmm INTERFACE "MGPU_BUILD")
-  # target_compile_definitions(rmm INTERFACE "RMM_DISABLE_CUDA_MALLOC_ASYNC") # async api is ok in mgpu first release.
+  target_compile_definitions(rmm INTERFACE "HGPU_BUILD")
+  # target_compile_definitions(rmm INTERFACE "RMM_DISABLE_CUDA_MALLOC_ASYNC") # async api is ok in HGPU first release.
 endif()
 
 if((BUILD_TESTS OR BUILD_BENCHMARKS) AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(rapids-cuda)
   rapids_cuda_init_architectures(RMM)
-  if(MGPU_BUILD)
-    set(CMAKE_MODULE_PATH "${CUBRIDGE_PATH}/cmake_module/maca")
+  if(HGPU_BUILD)
+    set(CMAKE_MODULE_PATH "${CUBRIDGE_PATH}/cmake_module/hpcc")
   endif()
   enable_language(CUDA)
 
@@ -218,7 +218,7 @@ The goal of the [RMM](https://github.com/rapidsai/rmm) is to provide:
   A collection of data structures that use the interface for memory allocation
 ]=])
 
-if (NOT MGPU_BUILD)
+if (NOT HGPU_BUILD)
 set(code_string
     [=[
 if(NOT TARGET rmm::Thrust)

@@ -48,7 +48,7 @@ TYPED_TEST(TypedUVectorTest, ZeroSizeConstructor)
   EXPECT_TRUE(vec.is_empty());
 }
 //  todo . cmodel is too slow. open this on real hardware.
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
 #define TEST_COUNT 12
 #else
 #define TEST_COUNT 12345

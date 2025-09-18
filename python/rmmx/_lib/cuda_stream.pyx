@@ -13,7 +13,7 @@
 # limitations under the License.
 
 cimport cython
-from rmmx._cuda.runtime cimport mcStream_t
+from rmmx._cuda.runtime cimport hcStream_t
 from libc.stdint cimport uintptr_t
 from libcpp cimport bool
 
@@ -28,7 +28,7 @@ cdef class CudaStream:
     def __cinit__(self):
         self.c_obj.reset(new cuda_stream())
 
-    cdef mcStream_t value(self) nogil except *:
+    cdef hcStream_t value(self) nogil except *:
         return self.c_obj.get()[0].value()
 
     cdef bool is_valid(self) nogil except *:

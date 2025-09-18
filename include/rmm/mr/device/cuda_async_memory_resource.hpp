@@ -105,7 +105,7 @@ class cuda_async_memory_resource final : public device_memory_resource {
     pool_props.location.type = cudaMemLocationTypeDevice;
     pool_props.location.id   = rmm::detail::current_device().value();
     cudaMemPool_t cuda_pool_handle{};
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
     RMM_CUDA_TRY(cudaMemPoolCreate(&cuda_pool_handle, &pool_props));
 #else
     RMM_CUDA_TRY(rmm::detail::async_alloc::cudaMemPoolCreate(&cuda_pool_handle, &pool_props));
@@ -120,7 +120,7 @@ class cuda_async_memory_resource final : public device_memory_resource {
     constexpr auto min_async_version{11050};
     if (driver_version < min_async_version) {
       int disabled{0};
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
       RMM_CUDA_TRY(cudaMemPoolSetAttribute(
         pool_handle(), cudaMemPoolReuseAllowOpportunistic, &disabled));
 #else
@@ -133,7 +133,7 @@ class cuda_async_memory_resource final : public device_memory_resource {
 
     // Need an l-value to take address to pass to cudaMemPoolSetAttribute
     uint64_t threshold = release_threshold.value_or(total);
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
     RMM_CUDA_TRY(cudaMemPoolSetAttribute(
       pool_handle(), cudaMemPoolAttrReleaseThreshold, &threshold));
 #else
@@ -163,7 +163,7 @@ class cuda_async_memory_resource final : public device_memory_resource {
   ~cuda_async_memory_resource() override
   {
 #if defined(RMM_CUDA_MALLOC_ASYNC_SUPPORT)
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
     RMM_ASSERT_CUDA_SUCCESS(cudaMemPoolDestroy(pool_handle()));
 #else
     RMM_ASSERT_CUDA_SUCCESS(rmm::detail::async_alloc::cudaMemPoolDestroy(pool_handle()));

@@ -76,8 +76,8 @@ TEST(CallbackTest, LoggingTest)
   mr.deallocate(ptr, 10_MiB);
 
   std::string output = testing::internal::GetCapturedStdout();
-#ifdef MGPU_BUILD
-// mgpu log will cause output many driver log . which will cause error.
+#ifdef HGPU_BUILD
+// HGPU log will cause output many driver log . which will cause error.
   std::string expect_allocate = fmt::format("Allocating {} bytes\n", 10_MiB);
   std::string expect_deallocate = fmt::format("Deallocating {} bytes\n", 10_MiB);
   std::string::size_type idx_allocate = output.find(expect_allocate);

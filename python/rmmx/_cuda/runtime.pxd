@@ -1,583 +1,583 @@
-cdef extern from "mcr/maca.h":
-    cdef struct MCstream_st:
+cdef extern from "hcr/hpcc.h":
+    cdef struct HCstream_st:
         pass
-ctypedef MCstream_st* mcStream_t
+ctypedef HCstream_st* hcStream_t
 
 
-cdef enum _mcError_t:
-    mcSuccess                             = 0
-    mcErrorInvalidValue                   = 1
-    mcErrorMemoryAllocation               = 2
-    mcErrorInitializationError            = 3
-    mcErrorDeinitialized                  = 4
-    mcErrorProfilerDisabled               = 5
-    mcErrorProfilerNotInitialized         = 6
-    mcErrorProfilerAlreadyStarted         = 7
-    mcErrorProfilerAlreadyStopped         = 8
-    mcErrorInvalidConfiguration           = 9
-    mcErrorInvalidPitchValue              = 12
-    mcErrorInvalidSymbol                  = 13
-    mcErrorInvalidHostPointer             = 16 # Invalid Host Pointer
-    mcErrorInvalidDevicePointer           = 17 # Invalid Device Pointer
-    mcErrorInvalidTexture                 = 18
-    mcErrorInvalidTextureBinding          = 19
-    mcErrorInvalidChannelDescriptor       = 20
-    mcErrorInvalidMemcpyDirection         = 21
-    mcErrorAddressOfConstant              = 22
-    mcErrorTextureFetchFailed             = 23
-    mcErrorTextureNotBound                = 24
-    mcErrorSynchronizationError           = 25
-    mcErrorInvalidFilterSetting           = 26
-    mcErrorInvalidNormSetting             = 27
-    mcErrorMixedDeviceExecution           = 28
-    mcErrorNotYetImplemented              = 31
-    mcErrorMemoryValueTooLarge            = 32
-    mcErrorStubLibrary                    = 34
-    mcErrorInsufficientDriver             = 35
-    mcErrorCallRequiresNewerDriver        = 36
-    mcErrorInvalidSurface                 = 37
-    mcErrorDuplicateVariableName          = 43
-    mcErrorDuplicateTextureName           = 44
-    mcErrorDuplicateSurfaceName           = 45
-    mcErrorDevicesUnavailable             = 46
-    mcErrorIncompatibleDriverContext      = 49
-    mcErrorMissingConfiguration           = 52
-    mcErrorPriorLaunchFailure             = 53
-    mcErrorLaunchMaxDepthExceeded         = 65
-    mcErrorLaunchFileScopedTex            = 66
-    mcErrorLaunchFileScopedSurf           = 67
-    mcErrorSyncDepthExceeded              = 68
-    mcErrorLaunchPendingCountExceeded     = 69
-    mcErrorInvalidDeviceFunction          = 98
-    mcErrorNoDevice                       = 100
-    mcErrorInvalidDevice                  = 101
-    mcErrorDeviceNotLicensed              = 102
-    mcErrorSoftwareValidityNotEstablished = 103
-    mcErrorStartupFailure                 = 127
-    mcErrorInvalidKernelImage             = 200
-    mcErrorDeviceUninitialized            = 201
-    mcErrorContextAlreadyCurrent          = 202
-    mcErrorMapBufferObjectFailed          = 205
-    mcErrorUnmapBufferObjectFailed        = 206
-    mcErrorArrayIsMapped                  = 207
-    mcErrorAlreadyMapped                  = 208
-    mcErrorNoKernelImageForDevice         = 209
-    mcErrorAlreadyAcquired                = 210
-    mcErrorNotMapped                      = 211
-    mcErrorNotMappedAsArray               = 212
-    mcErrorNotMappedAsPointer             = 213
-    mcErrorECCUncorrectable               = 214
-    mcErrorUnsupportedLimit               = 215
-    mcErrorDeviceAlreadyInUse             = 216
-    mcErrorPeerAccessUnsupported          = 217
-    mcErrorInvalidKernelFile              = 218
-    mcErrorInvalidGraphicsContext         = 219
-    mcErrorMxlinkUncorrectable            = 220
-    mcErrorJitCompilerNotFound            = 221
-    mcErrorUnsupportedKernelVersion       = 222
-    mcErrorJitCompilationDisabled         = 223
-    mcErrorUnsupportedExecAffinity        = 224
-    mcErrorInvalidSource                  = 300
-    mcErrorFileNotFound                   = 301
-    mcErrorSharedObjectSymbolNotFound     = 302
-    mcErrorSharedObjectInitFailed         = 303
-    mcErrorOperatingSystem                = 304
-    mcErrorInvalidResourceHandle          = 400
-    mcErrorIllegalState                   = 401
-    mcErrorSymbolNotFound                 = 500
-    mcErrorNotReady                       = 600
-    mcErrorIllegalAddress                 = 700
-    mcErrorLaunchOutOfResources           = 701
-    mcErrorLaunchTimeout                  = 702
-    mcErrorLaunchIncompatibleTexturing    = 703
-    mcErrorPeerAccessAlreadyEnabled       = 704
-    mcErrorPeerAccessNotEnabled           = 705
-    mcErrorSetOnActiveProcess             = 708
-    mcErrorContextIsDestroyed             = 709
-    mcErrorAssert                         = 710
-    mcErrorTooManyPeers                   = 711
-    mcErrorHostMemoryAlreadyRegistered    = 712
-    mcErrorHostMemoryNotRegistered        = 713
-    mcErrorHardwareStackError             = 714
-    mcErrorIllegalInstruction             = 715
-    mcErrorMisalignedAddress              = 716
-    mcErrorInvalidAddressSpace            = 717
-    mcErrorInvalidPc                      = 718
-    mcErrorLaunchFailure                  = 719
-    mcErrorCooperativeLaunchTooLarge      = 720
-    mcErrorNotPermitted                   = 800
-    mcErrorNotSupported                   = 801
-    mcErrorSystemNotReady                 = 802
-    mcErrorSystemDriverMismatch           = 803
-    mcErrorCompatNotSupportedOnDevice     = 804
-    mcErrorMpsConnectionFailed            = 805
-    mcErrorMpsRpcFailure                  = 806
-    mcErrorMpsServerNotReady              = 807
-    mcErrorMpsMaxClientsReached           = 808
-    mcErrorMpsMaxConnectionsReached       = 809
-    mcErrorStreamCaptureUnsupported       = 900
-    mcErrorStreamCaptureInvalidated       = 901
-    mcErrorStreamCaptureMerge             = 902
-    mcErrorStreamCaptureUnmatched         = 903
-    mcErrorStreamCaptureUnjoined          = 904
-    mcErrorStreamCaptureIsolation         = 905
-    mcErrorStreamCaptureImplicit          = 906
-    mcErrorCapturedEvent                  = 907
-    mcErrorStreamCaptureWrongThread       = 908
-    mcErrorTimeout                        = 909
-    mcErrorGraphExecUpdateFailure         = 910
-    mcErrorExternalDevice                 = 911
-    mcErrorGraphExecUpdateCommandDisMatch = 912
-    mcErrorGraphExecUpdateNodeTypeChanged = 913
-    mcErrorUnknown                        = 999
-    mcErrorDuplicateLoadModule            = 1003
-    mcErrorModuleNotFound                 = 1004
-    mcErrorDuplicateDevice                = 1005
-    mcErrorDumpBCfile                     = 1008
-    mcErrorRecompile                      = 1009
-    mcErrorApplyRelocation                = 1010
-    mcErrorFileSaveFailed                 = 1011
-    mcErrorNoBitcodeForGPU                = 1012
-    mcErrorInvalidKernel                  = 2000
-    mcErrorDeviceNotFound                 = 2001
-    mcErrorGetDeviceImageBase             = 2002
-    mcErrorApiFailureBase                 = 10000
-    mcErrorDockerDriverUnload             = 10001
-    mcErrorDriverWarmReset                = 10002
-    mcErrorDriverMismatch                 = 10003 # User mode component is not compatible
+cdef enum _hcError_t:
+    hcSuccess                             = 0
+    hcErrorInvalidValue                   = 1
+    hcErrorMemoryAllocation               = 2
+    hcErrorInitializationError            = 3
+    hcErrorDeinitialized                  = 4
+    hcErrorProfilerDisabled               = 5
+    hcErrorProfilerNotInitialized         = 6
+    hcErrorProfilerAlreadyStarted         = 7
+    hcErrorProfilerAlreadyStopped         = 8
+    hcErrorInvalidConfiguration           = 9
+    hcErrorInvalidPitchValue              = 12
+    hcErrorInvalidSymbol                  = 13
+    hcErrorInvalidHostPointer             = 16 # Invalid Host Pointer
+    hcErrorInvalidDevicePointer           = 17 # Invalid Device Pointer
+    hcErrorInvalidTexture                 = 18
+    hcErrorInvalidTextureBinding          = 19
+    hcErrorInvalidChannelDescriptor       = 20
+    hcErrorInvalidMemcpyDirection         = 21
+    hcErrorAddressOfConstant              = 22
+    hcErrorTextureFetchFailed             = 23
+    hcErrorTextureNotBound                = 24
+    hcErrorSynchronizationError           = 25
+    hcErrorInvalidFilterSetting           = 26
+    hcErrorInvalidNormSetting             = 27
+    hcErrorMixedDeviceExecution           = 28
+    hcErrorNotYetImplemented              = 31
+    hcErrorMemoryValueTooLarge            = 32
+    hcErrorStubLibrary                    = 34
+    hcErrorInsufficientDriver             = 35
+    hcErrorCallRequiresNewerDriver        = 36
+    hcErrorInvalidSurface                 = 37
+    hcErrorDuplicateVariableName          = 43
+    hcErrorDuplicateTextureName           = 44
+    hcErrorDuplicateSurfaceName           = 45
+    hcErrorDevicesUnavailable             = 46
+    hcErrorIncompatibleDriverContext      = 49
+    hcErrorMissingConfiguration           = 52
+    hcErrorPriorLaunchFailure             = 53
+    hcErrorLaunchMaxDepthExceeded         = 65
+    hcErrorLaunchFileScopedTex            = 66
+    hcErrorLaunchFileScopedSurf           = 67
+    hcErrorSyncDepthExceeded              = 68
+    hcErrorLaunchPendingCountExceeded     = 69
+    hcErrorInvalidDeviceFunction          = 98
+    hcErrorNoDevice                       = 100
+    hcErrorInvalidDevice                  = 101
+    hcErrorDeviceNotLicensed              = 102
+    hcErrorSoftwareValidityNotEstablished = 103
+    hcErrorStartupFailure                 = 127
+    hcErrorInvalidKernelImage             = 200
+    hcErrorDeviceUninitialized            = 201
+    hcErrorContextAlreadyCurrent          = 202
+    hcErrorMapBufferObjectFailed          = 205
+    hcErrorUnmapBufferObjectFailed        = 206
+    hcErrorArrayIsMapped                  = 207
+    hcErrorAlreadyMapped                  = 208
+    hcErrorNoKernelImageForDevice         = 209
+    hcErrorAlreadyAcquired                = 210
+    hcErrorNotMapped                      = 211
+    hcErrorNotMappedAsArray               = 212
+    hcErrorNotMappedAsPointer             = 213
+    hcErrorECCUncorrectable               = 214
+    hcErrorUnsupportedLimit               = 215
+    hcErrorDeviceAlreadyInUse             = 216
+    hcErrorPeerAccessUnsupported          = 217
+    hcErrorInvalidKernelFile              = 218
+    hcErrorInvalidGraphicsContext         = 219
+    hcErrorMxlinkUncorrectable            = 220
+    hcErrorJitCompilerNotFound            = 221
+    hcErrorUnsupportedKernelVersion       = 222
+    hcErrorJitCompilationDisabled         = 223
+    hcErrorUnsupportedExecAffinity        = 224
+    hcErrorInvalidSource                  = 300
+    hcErrorFileNotFound                   = 301
+    hcErrorSharedObjectSymbolNotFound     = 302
+    hcErrorSharedObjectInitFailed         = 303
+    hcErrorOperatingSystem                = 304
+    hcErrorInvalidResourceHandle          = 400
+    hcErrorIllegalState                   = 401
+    hcErrorSymbolNotFound                 = 500
+    hcErrorNotReady                       = 600
+    hcErrorIllegalAddress                 = 700
+    hcErrorLaunchOutOfResources           = 701
+    hcErrorLaunchTimeout                  = 702
+    hcErrorLaunchIncompatibleTexturing    = 703
+    hcErrorPeerAccessAlreadyEnabled       = 704
+    hcErrorPeerAccessNotEnabled           = 705
+    hcErrorSetOnActiveProcess             = 708
+    hcErrorContextIsDestroyed             = 709
+    hcErrorAssert                         = 710
+    hcErrorTooManyPeers                   = 711
+    hcErrorHostMemoryAlreadyRegistered    = 712
+    hcErrorHostMemoryNotRegistered        = 713
+    hcErrorHardwareStackError             = 714
+    hcErrorIllegalInstruction             = 715
+    hcErrorMisalignedAddress              = 716
+    hcErrorInvalidAddressSpace            = 717
+    hcErrorInvalidPc                      = 718
+    hcErrorLaunchFailure                  = 719
+    hcErrorCooperativeLaunchTooLarge      = 720
+    hcErrorNotPermitted                   = 800
+    hcErrorNotSupported                   = 801
+    hcErrorSystemNotReady                 = 802
+    hcErrorSystemDriverMismatch           = 803
+    hcErrorCompatNotSupportedOnDevice     = 804
+    hcErrorMpsConnectionFailed            = 805
+    hcErrorMpsRpcFailure                  = 806
+    hcErrorMpsServerNotReady              = 807
+    hcErrorMpsMaxClientsReached           = 808
+    hcErrorMpsMaxConnectionsReached       = 809
+    hcErrorStreamCaptureUnsupported       = 900
+    hcErrorStreamCaptureInvalidated       = 901
+    hcErrorStreamCaptureMerge             = 902
+    hcErrorStreamCaptureUnmatched         = 903
+    hcErrorStreamCaptureUnjoined          = 904
+    hcErrorStreamCaptureIsolation         = 905
+    hcErrorStreamCaptureImplicit          = 906
+    hcErrorCapturedEvent                  = 907
+    hcErrorStreamCaptureWrongThread       = 908
+    hcErrorTimeout                        = 909
+    hcErrorGraphExecUpdateFailure         = 910
+    hcErrorExternalDevice                 = 911
+    hcErrorGraphExecUpdateCommandDisMatch = 912
+    hcErrorGraphExecUpdateNodeTypeChanged = 913
+    hcErrorUnknown                        = 999
+    hcErrorDuplicateLoadModule            = 1003
+    hcErrorModuleNotFound                 = 1004
+    hcErrorDuplicateDevice                = 1005
+    hcErrorDumpBCfile                     = 1008
+    hcErrorRecompile                      = 1009
+    hcErrorApplyRelocation                = 1010
+    hcErrorFileSaveFailed                 = 1011
+    hcErrorNoBitcodeForGPU                = 1012
+    hcErrorInvalidKernel                  = 2000
+    hcErrorDeviceNotFound                 = 2001
+    hcErrorGetDeviceImageBase             = 2002
+    hcErrorApiFailureBase                 = 10000
+    hcErrorDockerDriverUnload             = 10001
+    hcErrorDriverWarmReset                = 10002
+    hcErrorDriverMismatch                 = 10003 # User mode component is not compatible
                                                    #  with kernel Mx driver
-    mcErrorInvalidParameter = 10004               # XPU identifies input parameters invalid
-    mcErrorInvalidHandle    = 10005               # XPU identifies handle parameter invalid
-    mcErrorInvalidUnit      = 10006 # XPU identifies node or unit parameter invalid
-    mcErrorNoMemory         = 10007 # No memory available
-    mcErrorBufferTooSmall   = 10008 # A buffer needed to handle a request is too small
-    mcErrorNotAddNbg        = 10009 # have not add nbg file
-    mcErrorNotImplemented   = 10010 # XPU function is not implemented for this set of paramters
-    mcErrorUnavailable      = 10011 # XPU function is not available currently
+    hcErrorInvalidParameter = 10004               # XPU identifies input parameters invalid
+    hcErrorInvalidHandle    = 10005               # XPU identifies handle parameter invalid
+    hcErrorInvalidUnit      = 10006 # XPU identifies node or unit parameter invalid
+    hcErrorNoMemory         = 10007 # No memory available
+    hcErrorBufferTooSmall   = 10008 # A buffer needed to handle a request is too small
+    hcErrorNotAddNbg        = 10009 # have not add nbg file
+    hcErrorNotImplemented   = 10010 # XPU function is not implemented for this set of paramters
+    hcErrorUnavailable      = 10011 # XPU function is not available currently
                                      #  on this node (but may be at a later time)
-    mcErrorOutOfResources = 10012   # XPU function request exceeds
+    hcErrorOutOfResources = 10012   # XPU function request exceeds
                                      #  the resources currently available.
-    mcErrorKernelIoChannelNotOpened = 10013 # XPU driver path not opened
-    mcErrorKernelCommunication      = 10014 # user-kernel mode communication failure
-    mcErrorKernelAlreadyOpened      = 10015 # XPU driver path already opened
-    mcErrormacaMMUUnvailable = 10016 # ATS/PRI 1.1 (Address Translation Services) not available
+    hcErrorKernelIoChannelNotOpened = 10013 # XPU driver path not opened
+    hcErrorKernelCommunication      = 10014 # user-kernel mode communication failure
+    hcErrorKernelAlreadyOpened      = 10015 # XPU driver path already opened
+    hcErrormacaMMUUnvailable = 10016 # ATS/PRI 1.1 (Address Translation Services) not available
                                       # (IOMMU driver not installed or not-available)
-    mcErrorWaitFailure              = 10017 # The wait operation failed
-    mcErrorWaitTimeout              = 10018 # The wait operation timed out
-    mcErrorInternal                 = 10019 # Internal error happened
-    mcErrorCommitFailure            = 10020 # Commit command failed
-    mcErrorMemoryAlreadyRegistered  = 10021 # Memory buffer already registered
-    mcErrorMemoryNotRegistered      = 10022 # Memory buffer not registered
-    mcErrorMemoryAlignment          = 10023 # Memory parameter not aligned
-    mcErrorInitialized              = 10024 # device init
-    mcErrorInvalidContext           = 10025 # The context is invalid
-    mcErrorContextAlreadyInUse      = 10026 # The context is already in use
-    mcErrorNotFound                 = 10027 # Not found error
-    mcErrorContextIsDestroy         = 10028 # The context has been destroyed
-    mcErrorNeedMoreInput            = 10029 # need more data to process
-    mcErrorDriverFunctionLevelReset = 10030 # Function level reset
-    mcErrorBusy                     = 10031 # queue busy
-    mcErrorKernelExecTimeout        = 10032 # kernel execute timeout
-    mcErrorMax
+    hcErrorWaitFailure              = 10017 # The wait operation failed
+    hcErrorWaitTimeout              = 10018 # The wait operation timed out
+    hcErrorInternal                 = 10019 # Internal error happened
+    hcErrorCommitFailure            = 10020 # Commit command failed
+    hcErrorMemoryAlreadyRegistered  = 10021 # Memory buffer already registered
+    hcErrorMemoryNotRegistered      = 10022 # Memory buffer not registered
+    hcErrorMemoryAlignment          = 10023 # Memory parameter not aligned
+    hcErrorInitialized              = 10024 # device init
+    hcErrorInvalidContext           = 10025 # The context is invalid
+    hcErrorContextAlreadyInUse      = 10026 # The context is already in use
+    hcErrorNotFound                 = 10027 # Not found error
+    hcErrorContextIsDestroy         = 10028 # The context has been destroyed
+    hcErrorNeedMoreInput            = 10029 # need more data to process
+    hcErrorDriverFunctionLevelReset = 10030 # Function level reset
+    hcErrorBusy                     = 10031 # queue busy
+    hcErrorKernelExecTimeout        = 10032 # kernel execute timeout
+    hcErrorMax
 
 
 cpdef enum Error_t:
-    cudaSuccess = _mcError_t.mcSuccess
-    cudaErrorInvalidValue = _mcError_t.mcErrorInvalidValue
-    cudaErrorMemoryAllocation = _mcError_t.mcErrorMemoryAllocation
-    cudaErrorInitializationError = _mcError_t.mcErrorInitializationError
-    cudaErrorCudartUnloading = _mcError_t.mcErrorDeinitialized
-    cudaErrorProfilerDisabled = _mcError_t.mcErrorProfilerDisabled
-    cudaErrorProfilerNotInitialized = _mcError_t.mcErrorProfilerNotInitialized
-    cudaErrorProfilerAlreadyStarted = _mcError_t.mcErrorProfilerAlreadyStarted
-    cudaErrorProfilerAlreadyStopped = _mcError_t.mcErrorProfilerAlreadyStopped
-    cudaErrorInvalidConfiguration = _mcError_t.mcErrorInvalidConfiguration
-    cudaErrorInvalidPitchValue = _mcError_t.mcErrorInvalidPitchValue
-    cudaErrorInvalidSymbol = _mcError_t.mcErrorInvalidSymbol
-    cudaErrorInvalidHostPointer = _mcError_t.mcErrorInvalidHostPointer
-    cudaErrorInvalidDevicePointer = _mcError_t.mcErrorInvalidDevicePointer
-    cudaErrorInvalidTexture = _mcError_t.mcErrorInvalidTexture
-    cudaErrorInvalidTextureBinding = _mcError_t.mcErrorInvalidTextureBinding
-    cudaErrorInvalidChannelDescriptor = _mcError_t.mcErrorInvalidChannelDescriptor
-    cudaErrorInvalidMemcpyDirection = _mcError_t.mcErrorInvalidMemcpyDirection
-    cudaErrorAddressOfConstant = _mcError_t.mcErrorAddressOfConstant
-    cudaErrorTextureFetchFailed = _mcError_t.mcErrorTextureFetchFailed
-    cudaErrorTextureNotBound = _mcError_t.mcErrorTextureNotBound
-    cudaErrorSynchronizationError = _mcError_t.mcErrorSynchronizationError
-    cudaErrorInvalidFilterSetting = _mcError_t.mcErrorInvalidFilterSetting
-    cudaErrorInvalidNormSetting = _mcError_t.mcErrorInvalidNormSetting
-    cudaErrorMixedDeviceExecution = _mcError_t.mcErrorMixedDeviceExecution
-    cudaErrorNotYetImplemented = _mcError_t.mcErrorNotYetImplemented
-    cudaErrorMemoryValueTooLarge = _mcError_t.mcErrorMemoryValueTooLarge
-    cudaErrorStubLibrary = _mcError_t.mcErrorStubLibrary
-    cudaErrorInsufficientDriver = _mcError_t.mcErrorInsufficientDriver
-    cudaErrorCallRequiresNewerDriver = _mcError_t.mcErrorCallRequiresNewerDriver
-    cudaErrorInvalidSurface = _mcError_t.mcErrorInvalidSurface
-    cudaErrorDuplicateVariableName = _mcError_t.mcErrorDuplicateVariableName
-    cudaErrorDuplicateTextureName = _mcError_t.mcErrorDuplicateTextureName
-    cudaErrorDuplicateSurfaceName = _mcError_t.mcErrorDuplicateSurfaceName
-    cudaErrorDevicesUnavailable = _mcError_t.mcErrorDevicesUnavailable
-    cudaErrorIncompatibleDriverContext = _mcError_t.mcErrorIncompatibleDriverContext
-    cudaErrorMissingConfiguration = _mcError_t.mcErrorMissingConfiguration
-    cudaErrorPriorLaunchFailure = _mcError_t.mcErrorPriorLaunchFailure
-    cudaErrorLaunchMaxDepthExceeded = _mcError_t.mcErrorLaunchMaxDepthExceeded
-    cudaErrorLaunchFileScopedTex = _mcError_t.mcErrorLaunchFileScopedTex
-    cudaErrorLaunchFileScopedSurf = _mcError_t.mcErrorLaunchFileScopedSurf
-    cudaErrorSyncDepthExceeded = _mcError_t.mcErrorSyncDepthExceeded
-    cudaErrorLaunchPendingCountExceeded = _mcError_t.mcErrorLaunchPendingCountExceeded
-    cudaErrorInvalidDeviceFunction = _mcError_t.mcErrorInvalidDeviceFunction
-    cudaErrorNoDevice = _mcError_t.mcErrorNoDevice
-    cudaErrorInvalidDevice = _mcError_t.mcErrorInvalidDevice
-    cudaErrorDeviceNotLicensed = _mcError_t.mcErrorDeviceNotLicensed
-    cudaErrorSoftwareValidityNotEstablished = _mcError_t.mcErrorSoftwareValidityNotEstablished
-    cudaErrorStartupFailure = _mcError_t.mcErrorStartupFailure
-    cudaErrorInvalidKernelImage = _mcError_t.mcErrorInvalidKernelImage
-    cudaErrorDeviceUninitialized = _mcError_t.mcErrorDeviceUninitialized
-    cudaErrorMapBufferObjectFailed = _mcError_t.mcErrorMapBufferObjectFailed
-    cudaErrorUnmapBufferObjectFailed = _mcError_t.mcErrorUnmapBufferObjectFailed
-    cudaErrorArrayIsMapped = _mcError_t.mcErrorArrayIsMapped
-    cudaErrorAlreadyMapped = _mcError_t.mcErrorAlreadyMapped
-    cudaErrorNoKernelImageForDevice = _mcError_t.mcErrorNoKernelImageForDevice
-    cudaErrorAlreadyAcquired = _mcError_t.mcErrorAlreadyAcquired
-    cudaErrorNotMapped = _mcError_t.mcErrorNotMapped
-    cudaErrorNotMappedAsArray = _mcError_t.mcErrorNotMappedAsArray
-    cudaErrorNotMappedAsPointer = _mcError_t.mcErrorNotMappedAsPointer
-    cudaErrorECCUncorrectable = _mcError_t.mcErrorECCUncorrectable
-    cudaErrorUnsupportedLimit = _mcError_t.mcErrorUnsupportedLimit
-    cudaErrorDeviceAlreadyInUse = _mcError_t.mcErrorDeviceAlreadyInUse
-    cudaErrorPeerAccessUnsupported = _mcError_t.mcErrorPeerAccessUnsupported
-    cudaErrorInvalidPtx = _mcError_t.mcErrorInvalidKernelFile
-    cudaErrorInvalidGraphicsContext = _mcError_t.mcErrorInvalidGraphicsContext
-    cudaErrorNvlinkUncorrectable = _mcError_t.mcErrorMxlinkUncorrectable
-    cudaErrorJitCompilerNotFound = _mcError_t.mcErrorJitCompilerNotFound
-    cudaErrorUnsupportedPtxVersion = _mcError_t.mcErrorUnsupportedKernelVersion
-    cudaErrorJitCompilationDisabled = _mcError_t.mcErrorJitCompilationDisabled
-    cudaErrorUnsupportedExecAffinity = _mcError_t.mcErrorUnsupportedExecAffinity
-    cudaErrorInvalidSource = _mcError_t.mcErrorInvalidSource
-    cudaErrorFileNotFound = _mcError_t.mcErrorFileNotFound
-    cudaErrorSharedObjectSymbolNotFound = _mcError_t.mcErrorSharedObjectSymbolNotFound
-    cudaErrorSharedObjectInitFailed = _mcError_t.mcErrorSharedObjectInitFailed
-    cudaErrorOperatingSystem = _mcError_t.mcErrorOperatingSystem
-    cudaErrorInvalidResourceHandle = _mcError_t.mcErrorInvalidResourceHandle
-    cudaErrorIllegalState = _mcError_t.mcErrorIllegalState
-    cudaErrorSymbolNotFound = _mcError_t.mcErrorSymbolNotFound
-    cudaErrorNotReady = _mcError_t.mcErrorNotReady
-    cudaErrorIllegalAddress = _mcError_t.mcErrorIllegalAddress
-    cudaErrorLaunchOutOfResources = _mcError_t.mcErrorLaunchOutOfResources
-    cudaErrorLaunchTimeout = _mcError_t.mcErrorLaunchTimeout
-    cudaErrorLaunchIncompatibleTexturing = _mcError_t.mcErrorLaunchIncompatibleTexturing
-    cudaErrorPeerAccessAlreadyEnabled = _mcError_t.mcErrorPeerAccessAlreadyEnabled
-    cudaErrorPeerAccessNotEnabled = _mcError_t.mcErrorPeerAccessNotEnabled
-    cudaErrorSetOnActiveProcess = _mcError_t.mcErrorSetOnActiveProcess
-    cudaErrorContextIsDestroyed = _mcError_t.mcErrorContextIsDestroyed
-    cudaErrorAssert = _mcError_t.mcErrorAssert
-    cudaErrorTooManyPeers = _mcError_t.mcErrorTooManyPeers
-    cudaErrorHostMemoryAlreadyRegistered = _mcError_t.mcErrorHostMemoryAlreadyRegistered
-    cudaErrorHostMemoryNotRegistered = _mcError_t.mcErrorHostMemoryNotRegistered
-    cudaErrorHardwareStackError = _mcError_t.mcErrorHardwareStackError
-    cudaErrorIllegalInstruction = _mcError_t.mcErrorIllegalInstruction
-    cudaErrorMisalignedAddress = _mcError_t.mcErrorMisalignedAddress
-    cudaErrorInvalidAddressSpace = _mcError_t.mcErrorInvalidAddressSpace
-    cudaErrorInvalidPc = _mcError_t.mcErrorInvalidPc
-    cudaErrorLaunchFailure = _mcError_t.mcErrorLaunchFailure
-    cudaErrorCooperativeLaunchTooLarge = _mcError_t.mcErrorCooperativeLaunchTooLarge
-    cudaErrorNotPermitted = _mcError_t.mcErrorNotPermitted
-    cudaErrorNotSupported = _mcError_t.mcErrorNotSupported
-    cudaErrorSystemNotReady = _mcError_t.mcErrorSystemNotReady
-    cudaErrorSystemDriverMismatch = _mcError_t.mcErrorSystemDriverMismatch
-    cudaErrorCompatNotSupportedOnDevice = _mcError_t.mcErrorCompatNotSupportedOnDevice
-    cudaErrorMpsConnectionFailed = _mcError_t.mcErrorMpsConnectionFailed
-    cudaErrorMpsRpcFailure = _mcError_t.mcErrorMpsRpcFailure
-    cudaErrorMpsServerNotReady = _mcError_t.mcErrorMpsServerNotReady
-    cudaErrorMpsMaxClientsReached = _mcError_t.mcErrorMpsMaxClientsReached
-    cudaErrorMpsMaxConnectionsReached = _mcError_t.mcErrorMpsMaxConnectionsReached
-    cudaErrorStreamCaptureUnsupported = _mcError_t.mcErrorStreamCaptureUnsupported
-    cudaErrorStreamCaptureInvalidated = _mcError_t.mcErrorStreamCaptureInvalidated
-    cudaErrorStreamCaptureMerge = _mcError_t.mcErrorStreamCaptureMerge
-    cudaErrorStreamCaptureUnmatched = _mcError_t.mcErrorStreamCaptureUnmatched
-    cudaErrorStreamCaptureUnjoined = _mcError_t.mcErrorStreamCaptureUnjoined
-    cudaErrorStreamCaptureIsolation = _mcError_t.mcErrorStreamCaptureIsolation
-    cudaErrorStreamCaptureImplicit = _mcError_t.mcErrorStreamCaptureImplicit
-    cudaErrorCapturedEvent = _mcError_t.mcErrorCapturedEvent
-    cudaErrorStreamCaptureWrongThread = _mcError_t.mcErrorStreamCaptureWrongThread
-    cudaErrorTimeout = _mcError_t.mcErrorTimeout
-    cudaErrorGraphExecUpdateFailure = _mcError_t.mcErrorGraphExecUpdateFailure
-    cudaErrorExternalDevice = _mcError_t.mcErrorExternalDevice
-    cudaErrorUnknown = _mcError_t.mcErrorUnknown
-    cudaErrorApiFailureBase = _mcError_t.mcErrorApiFailureBase
+    cudaSuccess = _hcError_t.hcSuccess
+    cudaErrorInvalidValue = _hcError_t.hcErrorInvalidValue
+    cudaErrorMemoryAllocation = _hcError_t.hcErrorMemoryAllocation
+    cudaErrorInitializationError = _hcError_t.hcErrorInitializationError
+    cudaErrorCudartUnloading = _hcError_t.hcErrorDeinitialized
+    cudaErrorProfilerDisabled = _hcError_t.hcErrorProfilerDisabled
+    cudaErrorProfilerNotInitialized = _hcError_t.hcErrorProfilerNotInitialized
+    cudaErrorProfilerAlreadyStarted = _hcError_t.hcErrorProfilerAlreadyStarted
+    cudaErrorProfilerAlreadyStopped = _hcError_t.hcErrorProfilerAlreadyStopped
+    cudaErrorInvalidConfiguration = _hcError_t.hcErrorInvalidConfiguration
+    cudaErrorInvalidPitchValue = _hcError_t.hcErrorInvalidPitchValue
+    cudaErrorInvalidSymbol = _hcError_t.hcErrorInvalidSymbol
+    cudaErrorInvalidHostPointer = _hcError_t.hcErrorInvalidHostPointer
+    cudaErrorInvalidDevicePointer = _hcError_t.hcErrorInvalidDevicePointer
+    cudaErrorInvalidTexture = _hcError_t.hcErrorInvalidTexture
+    cudaErrorInvalidTextureBinding = _hcError_t.hcErrorInvalidTextureBinding
+    cudaErrorInvalidChannelDescriptor = _hcError_t.hcErrorInvalidChannelDescriptor
+    cudaErrorInvalidMemcpyDirection = _hcError_t.hcErrorInvalidMemcpyDirection
+    cudaErrorAddressOfConstant = _hcError_t.hcErrorAddressOfConstant
+    cudaErrorTextureFetchFailed = _hcError_t.hcErrorTextureFetchFailed
+    cudaErrorTextureNotBound = _hcError_t.hcErrorTextureNotBound
+    cudaErrorSynchronizationError = _hcError_t.hcErrorSynchronizationError
+    cudaErrorInvalidFilterSetting = _hcError_t.hcErrorInvalidFilterSetting
+    cudaErrorInvalidNormSetting = _hcError_t.hcErrorInvalidNormSetting
+    cudaErrorMixedDeviceExecution = _hcError_t.hcErrorMixedDeviceExecution
+    cudaErrorNotYetImplemented = _hcError_t.hcErrorNotYetImplemented
+    cudaErrorMemoryValueTooLarge = _hcError_t.hcErrorMemoryValueTooLarge
+    cudaErrorStubLibrary = _hcError_t.hcErrorStubLibrary
+    cudaErrorInsufficientDriver = _hcError_t.hcErrorInsufficientDriver
+    cudaErrorCallRequiresNewerDriver = _hcError_t.hcErrorCallRequiresNewerDriver
+    cudaErrorInvalidSurface = _hcError_t.hcErrorInvalidSurface
+    cudaErrorDuplicateVariableName = _hcError_t.hcErrorDuplicateVariableName
+    cudaErrorDuplicateTextureName = _hcError_t.hcErrorDuplicateTextureName
+    cudaErrorDuplicateSurfaceName = _hcError_t.hcErrorDuplicateSurfaceName
+    cudaErrorDevicesUnavailable = _hcError_t.hcErrorDevicesUnavailable
+    cudaErrorIncompatibleDriverContext = _hcError_t.hcErrorIncompatibleDriverContext
+    cudaErrorMissingConfiguration = _hcError_t.hcErrorMissingConfiguration
+    cudaErrorPriorLaunchFailure = _hcError_t.hcErrorPriorLaunchFailure
+    cudaErrorLaunchMaxDepthExceeded = _hcError_t.hcErrorLaunchMaxDepthExceeded
+    cudaErrorLaunchFileScopedTex = _hcError_t.hcErrorLaunchFileScopedTex
+    cudaErrorLaunchFileScopedSurf = _hcError_t.hcErrorLaunchFileScopedSurf
+    cudaErrorSyncDepthExceeded = _hcError_t.hcErrorSyncDepthExceeded
+    cudaErrorLaunchPendingCountExceeded = _hcError_t.hcErrorLaunchPendingCountExceeded
+    cudaErrorInvalidDeviceFunction = _hcError_t.hcErrorInvalidDeviceFunction
+    cudaErrorNoDevice = _hcError_t.hcErrorNoDevice
+    cudaErrorInvalidDevice = _hcError_t.hcErrorInvalidDevice
+    cudaErrorDeviceNotLicensed = _hcError_t.hcErrorDeviceNotLicensed
+    cudaErrorSoftwareValidityNotEstablished = _hcError_t.hcErrorSoftwareValidityNotEstablished
+    cudaErrorStartupFailure = _hcError_t.hcErrorStartupFailure
+    cudaErrorInvalidKernelImage = _hcError_t.hcErrorInvalidKernelImage
+    cudaErrorDeviceUninitialized = _hcError_t.hcErrorDeviceUninitialized
+    cudaErrorMapBufferObjectFailed = _hcError_t.hcErrorMapBufferObjectFailed
+    cudaErrorUnmapBufferObjectFailed = _hcError_t.hcErrorUnmapBufferObjectFailed
+    cudaErrorArrayIsMapped = _hcError_t.hcErrorArrayIsMapped
+    cudaErrorAlreadyMapped = _hcError_t.hcErrorAlreadyMapped
+    cudaErrorNoKernelImageForDevice = _hcError_t.hcErrorNoKernelImageForDevice
+    cudaErrorAlreadyAcquired = _hcError_t.hcErrorAlreadyAcquired
+    cudaErrorNotMapped = _hcError_t.hcErrorNotMapped
+    cudaErrorNotMappedAsArray = _hcError_t.hcErrorNotMappedAsArray
+    cudaErrorNotMappedAsPointer = _hcError_t.hcErrorNotMappedAsPointer
+    cudaErrorECCUncorrectable = _hcError_t.hcErrorECCUncorrectable
+    cudaErrorUnsupportedLimit = _hcError_t.hcErrorUnsupportedLimit
+    cudaErrorDeviceAlreadyInUse = _hcError_t.hcErrorDeviceAlreadyInUse
+    cudaErrorPeerAccessUnsupported = _hcError_t.hcErrorPeerAccessUnsupported
+    cudaErrorInvalidPtx = _hcError_t.hcErrorInvalidKernelFile
+    cudaErrorInvalidGraphicsContext = _hcError_t.hcErrorInvalidGraphicsContext
+    cudaErrorNvlinkUncorrectable = _hcError_t.hcErrorMxlinkUncorrectable
+    cudaErrorJitCompilerNotFound = _hcError_t.hcErrorJitCompilerNotFound
+    cudaErrorUnsupportedPtxVersion = _hcError_t.hcErrorUnsupportedKernelVersion
+    cudaErrorJitCompilationDisabled = _hcError_t.hcErrorJitCompilationDisabled
+    cudaErrorUnsupportedExecAffinity = _hcError_t.hcErrorUnsupportedExecAffinity
+    cudaErrorInvalidSource = _hcError_t.hcErrorInvalidSource
+    cudaErrorFileNotFound = _hcError_t.hcErrorFileNotFound
+    cudaErrorSharedObjectSymbolNotFound = _hcError_t.hcErrorSharedObjectSymbolNotFound
+    cudaErrorSharedObjectInitFailed = _hcError_t.hcErrorSharedObjectInitFailed
+    cudaErrorOperatingSystem = _hcError_t.hcErrorOperatingSystem
+    cudaErrorInvalidResourceHandle = _hcError_t.hcErrorInvalidResourceHandle
+    cudaErrorIllegalState = _hcError_t.hcErrorIllegalState
+    cudaErrorSymbolNotFound = _hcError_t.hcErrorSymbolNotFound
+    cudaErrorNotReady = _hcError_t.hcErrorNotReady
+    cudaErrorIllegalAddress = _hcError_t.hcErrorIllegalAddress
+    cudaErrorLaunchOutOfResources = _hcError_t.hcErrorLaunchOutOfResources
+    cudaErrorLaunchTimeout = _hcError_t.hcErrorLaunchTimeout
+    cudaErrorLaunchIncompatibleTexturing = _hcError_t.hcErrorLaunchIncompatibleTexturing
+    cudaErrorPeerAccessAlreadyEnabled = _hcError_t.hcErrorPeerAccessAlreadyEnabled
+    cudaErrorPeerAccessNotEnabled = _hcError_t.hcErrorPeerAccessNotEnabled
+    cudaErrorSetOnActiveProcess = _hcError_t.hcErrorSetOnActiveProcess
+    cudaErrorContextIsDestroyed = _hcError_t.hcErrorContextIsDestroyed
+    cudaErrorAssert = _hcError_t.hcErrorAssert
+    cudaErrorTooManyPeers = _hcError_t.hcErrorTooManyPeers
+    cudaErrorHostMemoryAlreadyRegistered = _hcError_t.hcErrorHostMemoryAlreadyRegistered
+    cudaErrorHostMemoryNotRegistered = _hcError_t.hcErrorHostMemoryNotRegistered
+    cudaErrorHardwareStackError = _hcError_t.hcErrorHardwareStackError
+    cudaErrorIllegalInstruction = _hcError_t.hcErrorIllegalInstruction
+    cudaErrorMisalignedAddress = _hcError_t.hcErrorMisalignedAddress
+    cudaErrorInvalidAddressSpace = _hcError_t.hcErrorInvalidAddressSpace
+    cudaErrorInvalidPc = _hcError_t.hcErrorInvalidPc
+    cudaErrorLaunchFailure = _hcError_t.hcErrorLaunchFailure
+    cudaErrorCooperativeLaunchTooLarge = _hcError_t.hcErrorCooperativeLaunchTooLarge
+    cudaErrorNotPermitted = _hcError_t.hcErrorNotPermitted
+    cudaErrorNotSupported = _hcError_t.hcErrorNotSupported
+    cudaErrorSystemNotReady = _hcError_t.hcErrorSystemNotReady
+    cudaErrorSystemDriverMismatch = _hcError_t.hcErrorSystemDriverMismatch
+    cudaErrorCompatNotSupportedOnDevice = _hcError_t.hcErrorCompatNotSupportedOnDevice
+    cudaErrorMpsConnectionFailed = _hcError_t.hcErrorMpsConnectionFailed
+    cudaErrorMpsRpcFailure = _hcError_t.hcErrorMpsRpcFailure
+    cudaErrorMpsServerNotReady = _hcError_t.hcErrorMpsServerNotReady
+    cudaErrorMpsMaxClientsReached = _hcError_t.hcErrorMpsMaxClientsReached
+    cudaErrorMpsMaxConnectionsReached = _hcError_t.hcErrorMpsMaxConnectionsReached
+    cudaErrorStreamCaptureUnsupported = _hcError_t.hcErrorStreamCaptureUnsupported
+    cudaErrorStreamCaptureInvalidated = _hcError_t.hcErrorStreamCaptureInvalidated
+    cudaErrorStreamCaptureMerge = _hcError_t.hcErrorStreamCaptureMerge
+    cudaErrorStreamCaptureUnmatched = _hcError_t.hcErrorStreamCaptureUnmatched
+    cudaErrorStreamCaptureUnjoined = _hcError_t.hcErrorStreamCaptureUnjoined
+    cudaErrorStreamCaptureIsolation = _hcError_t.hcErrorStreamCaptureIsolation
+    cudaErrorStreamCaptureImplicit = _hcError_t.hcErrorStreamCaptureImplicit
+    cudaErrorCapturedEvent = _hcError_t.hcErrorCapturedEvent
+    cudaErrorStreahcaptureWrongThread = _hcError_t.hcErrorStreamCaptureWrongThread
+    cudaErrorTimeout = _hcError_t.hcErrorTimeout
+    cudaErrorGraphExecUpdateFailure = _hcError_t.hcErrorGraphExecUpdateFailure
+    cudaErrorExternalDevice = _hcError_t.hcErrorExternalDevice
+    cudaErrorUnknown = _hcError_t.hcErrorUnknown
+    cudaErrorApiFailureBase = _hcError_t.hcErrorApiFailureBase
 
 
-cdef enum mcDeviceAttribute_t:
-    mcDeviceAttributeMaxThreadsPerBlock      #/< Maximum number of threads per block.
-    mcDeviceAttributeMaxBlockDimX            #/< Maximum x-dimension of a block.
-    mcDeviceAttributeMaxBlockDimY            #/< Maximum y-dimension of a block.
-    mcDeviceAttributeMaxBlockDimZ            #/< Maximum z-dimension of a block.
-    mcDeviceAttributeMaxGridDimX             #/< Maximum x-dimension of a grid.
-    mcDeviceAttributeMaxGridDimY             #/< Maximum y-dimension of a grid.
-    mcDeviceAttributeMaxGridDimZ             #/< Maximum z-dimension of a grid.
-    mcDeviceAttributeMaxSharedMemoryPerBlock #/< Maximum shared memory available per block in
+cdef enum hcDeviceAttribute_t:
+    hcDeviceAttributeMaxThreadsPerBlock      #/< Maximum number of threads per block.
+    hcDeviceAttributeMaxBlockDimX            #/< Maximum x-dimension of a block.
+    hcDeviceAttributeMaxBlockDimY            #/< Maximum y-dimension of a block.
+    hcDeviceAttributeMaxBlockDimZ            #/< Maximum z-dimension of a block.
+    hcDeviceAttributeMaxGridDimX             #/< Maximum x-dimension of a grid.
+    hcDeviceAttributeMaxGridDimY             #/< Maximum y-dimension of a grid.
+    hcDeviceAttributeMaxGridDimZ             #/< Maximum z-dimension of a grid.
+    hcDeviceAttributeMaxSharedMemoryPerBlock #/< Maximum shared memory available per block in
                                             #/< bytes.
-    mcDeviceAttributeTotalConstantMemory     #/< Constant memory size in bytes.
-    mcDeviceAttributeWarpSize                #/< Warp size in threads. Deprecated soon use
-                                            #/< mcDeviceAttributeWaveSize instead.
-    mcDeviceAttributeWaveSize                #/< Wave size in threads.
-    mcDeviceAttributeMaxRegistersPerBlock    #/< Maximum number of 32-bit registers available to a
+    hcDeviceAttributeTotalConstantMemory     #/< Constant memory size in bytes.
+    hcDeviceAttributeWarpSize                #/< Warp size in threads. Deprecated soon use
+                                            #/< hcDeviceAttributeWaveSize instead.
+    hcDeviceAttributeWaveSize                #/< Wave size in threads.
+    hcDeviceAttributeMaxRegistersPerBlock    #/< Maximum number of 32-bit registers available to a
                                             #/< thread block. This number is shared by all thread
                                             #/< blocks simultaneously resident on a
                                             #/< multiprocessor.
-    mcDeviceAttributeMaxRegistersPerMultiprocessor #/< Maximum number of 32-bit registers
+    hcDeviceAttributeMaxRegistersPerMultiprocessor #/< Maximum number of 32-bit registers
                                                     #/< available to a multiprocessor
-    mcDeviceAttributeClockRate                     #/< Peak clock frequency in kilohertz.
-    mcDeviceAttributeMemoryClockRate               #/< Peak memory clock frequency in kilohertz.
-    mcDeviceAttributeMemoryBusWidth                #/< Global memory bus width in bits.
-    mcDeviceAttributeMultiProcessorCount           #/< Number of multiprocessors on the device.
-    mcDeviceAttributeComputeMode                   #/< Compute mode that device is currently in.
-    mcDeviceAttributeL2CacheSize #/< Size of L2 cache in bytes. 0 if the device doesn't have L2
+    hcDeviceAttributeClockRate                     #/< Peak clock frequency in kilohertz.
+    hcDeviceAttributeMemoryClockRate               #/< Peak memory clock frequency in kilohertz.
+    hcDeviceAttributeMemoryBusWidth                #/< Global memory bus width in bits.
+    hcDeviceAttributeMultiProcessorCount           #/< Number of multiprocessors on the device.
+    hcDeviceAttributeComputeMode                   #/< Compute mode that device is currently in.
+    hcDeviceAttributeL2CacheSize #/< Size of L2 cache in bytes. 0 if the device doesn't have L2
                                 #/< cache.
-    mcDeviceAttributeMaxThreadsPerMultiProcessor #/< Maximum resident threads per
+    hcDeviceAttributeMaxThreadsPerMultiProcessor #/< Maximum resident threads per
                                                 #/< multiprocessor.
-    mcDevAttrMaxBlocksPerMultiprocessor          #/< Maximum number of blocks per multiprocessor
-    mcDeviceAttributeComputeCapabilityMajor      #/< Major compute capability version number.
-    mcDeviceAttributeComputeCapabilityMinor      #/< Minor compute capability version number.
-    mcDeviceAttributeConcurrentKernels           #/< Device can possibly execute multiple kernels
+    hcDevAttrMaxBlocksPerMultiprocessor          #/< Maximum number of blocks per multiprocessor
+    hcDeviceAttributeComputeCapabilityMajor      #/< Major compute capability version number.
+    hcDeviceAttributeComputeCapabilityMinor      #/< Minor compute capability version number.
+    hcDeviceAttributeConcurrentKernels           #/< Device can possibly execute multiple kernels
                                                 #/< concurrently.
-    mcDeviceAttributePciBusId                    #/< PCI Bus ID.
-    mcDeviceAttributePciDeviceId                 #/< PCI Device ID.
-    mcDeviceAttributeMaxSharedMemoryPerMultiprocessor #/< Maximum Shared Memory Per
+    hcDeviceAttributePciBusId                    #/< PCI Bus ID.
+    hcDeviceAttributePciDeviceId                 #/< PCI Device ID.
+    hcDeviceAttributeMaxSharedMemoryPerMultiprocessor #/< Maximum Shared Memory Per
                                                     #/< Multiprocessor.
-    mcDeviceAttributeIsMultiGpuBoard                  #/< Multiple GPU devices.
-    mcDeviceAttributeIntegrated                       #/< iGPU
-    mcDeviceAttributeCooperativeLaunch                #/< Support cooperative launch
-    mcDeviceAttributeCooperativeMultiDeviceLaunch     #/< Support cooperative launch on multiple
+    hcDeviceAttributeIsMultiGpuBoard                  #/< Multiple GPU devices.
+    hcDeviceAttributeIntegrated                       #/< iGPU
+    hcDeviceAttributeCooperativeLaunch                #/< Support cooperative launch
+    hcDeviceAttributeCooperativeMultiDeviceLaunch     #/< Support cooperative launch on multiple
                                                     #/< devices
-    mcDeviceAttributeMaxTexture1DWidth                #/< Maximum number of elements in 1D images
-    mcDeviceAttributeMaxTexture2DWidth  #/< Maximum dimension width of 2D images in image elements
-    mcDeviceAttributeMaxTexture2DHeight #/< Maximum dimension height of 2D images in image
+    hcDeviceAttributeMaxTexture1DWidth                #/< Maximum number of elements in 1D images
+    hcDeviceAttributeMaxTexture2DWidth  #/< Maximum dimension width of 2D images in image elements
+    hcDeviceAttributeMaxTexture2DHeight #/< Maximum dimension height of 2D images in image
                                         #/< elements
-    mcDeviceAttributeMaxTexture3DWidth  #/< Maximum dimension width of 3D images in image elements
-    mcDeviceAttributeMaxTexture3DHeight #/< Maximum dimensions height of 3D images in image
+    hcDeviceAttributeMaxTexture3DWidth  #/< Maximum dimension width of 3D images in image elements
+    hcDeviceAttributeMaxTexture3DHeight #/< Maximum dimensions height of 3D images in image
                                         #/< elements
-    mcDeviceAttributeMaxTexture3DDepth  #/< Maximum dimensions depth of 3D images in image
+    hcDeviceAttributeMaxTexture3DDepth  #/< Maximum dimensions depth of 3D images in image
                                         #/< elements
 
-    mcDeviceAttributeHdpMemFlushCntl #/< Address of the HDP_MEM_COHERENCY_FLUSH_CNTL register
-    mcDeviceAttributeHdpRegFlushCntl #/< Address of the HDP_REG_COHERENCY_FLUSH_CNTL register
+    hcDeviceAttributeHdpMemFlushCntl #/< Address of the HDP_MEM_COHERENCY_FLUSH_CNTL register
+    hcDeviceAttributeHdpRegFlushCntl #/< Address of the HDP_REG_COHERENCY_FLUSH_CNTL register
 
-    mcDeviceAttributeMaxPitch              #/< Maximum pitch in bytes allowed by memory copies
-    mcDeviceAttributeTextureAlignment      #/< Alignment requirement for textures
-    mcDeviceAttributeTexturePitchAlignment #/< Pitch alignment requirement for 2D texture
+    hcDeviceAttributeMaxPitch              #/< Maximum pitch in bytes allowed by memory copies
+    hcDeviceAttributeTextureAlignment      #/< Alignment requirement for textures
+    hcDeviceAttributeTexturePitchAlignment #/< Pitch alignment requirement for 2D texture
                                             #/< references bound to pitched memory;
-    mcDeviceAttributeKernelExecTimeout     #/< Run time limit for kernels executed on the device
-    mcDeviceAttributeCanMapHostMemory #/< Device can map host memory into device address space
-    mcDeviceAttributeEccEnabled       #/< Device has ECC support enabled
+    hcDeviceAttributeKernelExecTimeout     #/< Run time limit for kernels executed on the device
+    hcDeviceAttributeCanMapHostMemory #/< Device can map host memory into device address space
+    hcDeviceAttributeEccEnabled       #/< Device has ECC support enabled
 
-    mcDeviceAttributeCooperativeMultiDeviceUnmatchedFunc      #/< Supports cooperative launch on
+    hcDeviceAttributeCooperativeMultiDeviceUnmatchedFunc      #/< Supports cooperative launch on
                                                             #/< multiple
                                                             #/ devices with unmatched functions
-    mcDeviceAttributeCooperativeMultiDeviceUnmatchedGridDim   #/< Supports cooperative launch on
+    hcDeviceAttributeCooperativeMultiDeviceUnmatchedGridDim   #/< Supports cooperative launch on
                                                             #/< multiple
                                                             #/ devices with unmatched grid
                                                             #/ dimensions
-    mcDeviceAttributeCooperativeMultiDeviceUnmatchedBlockDim  #/< Supports cooperative launch on
+    hcDeviceAttributeCooperativeMultiDeviceUnmatchedBlockDim  #/< Supports cooperative launch on
                                                             #/< multiple
                                                             #/ devices with unmatched block
                                                             #/ dimensions
-    mcDeviceAttributeCooperativeMultiDeviceUnmatchedSharedMem #/< Supports cooperative launch on
+    hcDeviceAttributeCooperativeMultiDeviceUnmatchedSharedMem #/< Supports cooperative launch on
                                                             #/< multiple
                                                             #/ devices with unmatched shared
                                                             #/ memories
-    mcDeviceAttributeAsicRevision  #/< Revision of the GPU in this device
-    mcDeviceAttributeManagedMemory #/< Device supports allocating managed memory on this system
-    mcDeviceAttributeDirectManagedMemAccessFromHost #/< Host can directly access managed memory
+    hcDeviceAttributeAsicRevision  #/< Revision of the GPU in this device
+    hcDeviceAttributeManagedMemory #/< Device supports allocating managed memory on this system
+    hcDeviceAttributeDirectManagedMemAccessFromHost #/< Host can directly access managed memory
                                                     #/< on
                                                     #/ the device without migration
-    mcDeviceAttributeConcurrentManagedAccess #/< Device can coherently access managed memory
+    hcDeviceAttributeConcurrentManagedAccess #/< Device can coherently access managed memory
                                             #/ concurrently with the CPU
-    mcDeviceAttributePageableMemoryAccess    #/< Device supports coherently accessing pageable
+    hcDeviceAttributePageableMemoryAccess    #/< Device supports coherently accessing pageable
                                             #/< memory
-                                            #/ without calling mcHostRegister on it
-    mcDeviceAttributePageableMemoryAccessUsesHostPageTables #/< Device accesses pageable memory
+                                            #/ without calling hcHostRegister on it
+    hcDeviceAttributePageableMemoryAccessUsesHostPageTables #/< Device accesses pageable memory
                                                             #/< via
                                                             #/ the host's page tables
-    mcDeviceAttributeVirtualMemoryManagementSupported       #/< Device supports virtual memory
+    hcDeviceAttributeVirtualMemoryManagementSupported       #/< Device supports virtual memory
                                                             #/< management APIs
-    mcDeviceAttributeHandleTypePosixFileDescriptorSupported #/< Device supports exporting memory
+    hcDeviceAttributeHandleTypePosixFileDescriptorSupported #/< Device supports exporting memory
                                                             #/< to a posix file descriptor with
-                                                            #/< mcMemExportToShareableHandle, if
-                                                            #/< requested via mcMemCreate
-    mcDeviceAttributeHandleTypeWin32HandleSupported #/< Device supports exporting memory to a
+                                                            #/< hcMemExportToShareableHandle, if
+                                                            #/< requested via hcMehcreate
+    hcDeviceAttributeHandleTypeWin32HandleSupported #/< Device supports exporting memory to a
                                                     #/< Win32 NT handle with
-                                                    #/< ::mcMemExportToShareableHandle, if
-                                                    #/< requested via mcMemCreate
-    mcDeviceAttributeGenericCompressionSupported    #/< Device supports compressible memory
-                                                    #/< allocation via mcMemCreate
-    mcDeviceAttributeCanUseStreamWaitValue #/< '1' if Device supports mcStreamWaitValue32() and
-                                            #/< mcStreamWaitValue64()  '0' otherwise.
-    mcDeviceAttributeCanUseStreamMemOps
-    mcDeviceAttributeCanUseStreamWaitWaitValueNor
-    mcDeviceAttributeCanFlushRemoteWrites
-    mcDeviceAttributeMemoryPoolsSupported
-    mcDeviceAttributeUnifiedAddressing #< Device shares a unified address space with the host
-    mcDeviceAttributeMaxAccessPolicyWindowSize #/< The max value of mcAccessPolicyWindow bytes.
-    mcDeviceAttributeMaxPersistingL2CacheSize  #/< Device's maximum l2 persisting setting bytes.
-    mcDeviceAttributeGpuOverlap       #< Device can possibly copy memory and execute a kernel
+                                                    #/< ::hcMemExportToShareableHandle, if
+                                                    #/< requested via hcMehcreate
+    hcDeviceAttributeGenericCompressionSupported    #/< Device supports compressible memory
+                                                    #/< allocation via hcMehcreate
+    hcDeviceAttributeCanUseStreamWaitValue #/< '1' if Device supports hcStreamWaitValue32() and
+                                            #/< hcStreamWaitValue64()  '0' otherwise.
+    hcDeviceAttributeCanUseStreamMemOps
+    hcDeviceAttributeCanUseStreamWaitWaitValueNor
+    hcDeviceAttributeCanFlushRemoteWrites
+    hcDeviceAttributeMemoryPoolsSupported
+    hcDeviceAttributeUnifiedAddressing #< Device shares a unified address space with the host
+    hcDeviceAttributeMaxAccessPolicyWindowSize #/< The max value of hcAccessPolicyWindow bytes.
+    hcDeviceAttributeMaxPersistingL2CacheSize  #/< Device's maximum l2 persisting setting bytes.
+    hcDeviceAttributeGpuOverlap       #< Device can possibly copy memory and execute a kernel
                                     # concurrently. Deprecated. Use instead
                                     # CU_DEVICE_ATTRIBUTE_ASYNC_ENGINE_COUNT.
-    mcDeviceAttributeAsyncEngineCount #< Number of asynchronous engines.
-    mcDeviceAttributeMemoryPoolSupportedHandleTypes #< Bitmask of handle types supported with
+    hcDeviceAttributeAsyncEngineCount #< Number of asynchronous engines.
+    hcDeviceAttributeMemoryPoolSupportedHandleTypes #< Bitmask of handle types supported with
                                                     # mempool based IPC
-    mcDeviceAttributeTexture1DLinearWidth           #< Maximum 1D linear texture width
-    mcDeviceAttributeTexture2DLinearWidth           #< Maximum 2D linear texture width
-    mcDeviceAttributeTexture2DLinearHeight          #< Maximum 2D linear texture height
-    mcDeviceAttributeTexture2DLinearPitch           #< Maximum 2D linear texture pitch in bytes
-    mcDeviceAttributeHostNativeAtomicSupported
-    mcDeviceAttributeMaxTexture1DLayeredWidth       #< Maximum 1D layered texture width
-    mcDeviceAttributeMaxTexture1DLayeredLayers      #< Maximum layers in a 1D layered texture
-    mcDeviceAttributeMaxTexture2DLayeredWidth       #< Maximum 2D layered texture width
-    mcDeviceAttributeMaxTexture2DLayeredHeight      #< Maximum 1D layered texture height
-    mcDeviceAttributeMaxTexture2DLayeredLayers      #< Maximum layers in a 2D layered texture
-    mcDeviceAttributeSurfaceAligement
-    mcDeviceAttributeComputePreemptionSupported
-    mcDeviceAttributePciDomainId #/< PCI Domain ID.
-    mcDeviceAttributeTccDriver
-    mcDeviceAttributeUnknow
-    mcDeviceAttributeMax
+    hcDeviceAttributeTexture1DLinearWidth           #< Maximum 1D linear texture width
+    hcDeviceAttributeTexture2DLinearWidth           #< Maximum 2D linear texture width
+    hcDeviceAttributeTexture2DLinearHeight          #< Maximum 2D linear texture height
+    hcDeviceAttributeTexture2DLinearPitch           #< Maximum 2D linear texture pitch in bytes
+    hcDeviceAttributeHostNativeAtomicSupported
+    hcDeviceAttributeMaxTexture1DLayeredWidth       #< Maximum 1D layered texture width
+    hcDeviceAttributeMaxTexture1DLayeredLayers      #< Maximum layers in a 1D layered texture
+    hcDeviceAttributeMaxTexture2DLayeredWidth       #< Maximum 2D layered texture width
+    hcDeviceAttributeMaxTexture2DLayeredHeight      #< Maximum 1D layered texture height
+    hcDeviceAttributeMaxTexture2DLayeredLayers      #< Maximum layers in a 2D layered texture
+    hcDeviceAttributeSurfaceAligement
+    hcDeviceAttributeComputePreemptionSupported
+    hcDeviceAttributePciDomainId #/< PCI Domain ID.
+    hcDeviceAttributeTccDriver
+    hcDeviceAttributeUnknow
+    hcDeviceAttributeMax
 
 
 # class cudaDeviceAttr(Enum):
 cpdef enum cudaDeviceAttr:
-    cudaDevAttrMaxThreadsPerBlock = mcDeviceAttribute_t.mcDeviceAttributeMaxThreadsPerBlock
-    cudaDevAttrMaxBlockDimX = mcDeviceAttribute_t.mcDeviceAttributeMaxBlockDimX
-    cudaDevAttrMaxBlockDimY = mcDeviceAttribute_t.mcDeviceAttributeMaxBlockDimY
-    cudaDevAttrMaxBlockDimZ = mcDeviceAttribute_t.mcDeviceAttributeMaxBlockDimZ
-    cudaDevAttrMaxGridDimX = mcDeviceAttribute_t.mcDeviceAttributeMaxGridDimX
-    cudaDevAttrMaxGridDimY = mcDeviceAttribute_t.mcDeviceAttributeMaxGridDimY
-    cudaDevAttrMaxGridDimZ = mcDeviceAttribute_t.mcDeviceAttributeMaxGridDimZ
-    cudaDevAttrMaxSharedMemoryPerBlock = mcDeviceAttribute_t.mcDeviceAttributeMaxSharedMemoryPerBlock
-    cudaDevAttrTotalConstantMemory = mcDeviceAttribute_t.mcDeviceAttributeTotalConstantMemory
-    cudaDevAttrWarpSize = mcDeviceAttribute_t.mcDeviceAttributeWarpSize
-    cudaDevAttrMaxPitch = mcDeviceAttribute_t.mcDeviceAttributeMaxPitch
-    cudaDevAttrMaxRegistersPerBlock = mcDeviceAttribute_t.mcDeviceAttributeMaxRegistersPerBlock
-    cudaDevAttrClockRate = mcDeviceAttribute_t.mcDeviceAttributeClockRate
-    cudaDevAttrTextureAlignment = mcDeviceAttribute_t.mcDeviceAttributeTextureAlignment
-    cudaDevAttrGpuOverlap = mcDeviceAttribute_t.mcDeviceAttributeGpuOverlap
-    cudaDevAttrMultiProcessorCount = mcDeviceAttribute_t.mcDeviceAttributeMultiProcessorCount
-    cudaDevAttrKernelExecTimeout = mcDeviceAttribute_t.mcDeviceAttributeKernelExecTimeout
-    cudaDevAttrIntegrated = mcDeviceAttribute_t.mcDeviceAttributeIntegrated
-    cudaDevAttrCanMapHostMemory = mcDeviceAttribute_t.mcDeviceAttributeCanMapHostMemory
-    cudaDevAttrComputeMode = mcDeviceAttribute_t.mcDeviceAttributeComputeMode
-    cudaDevAttrMaxTexture1DWidth = mcDeviceAttribute_t.mcDeviceAttributeMaxTexture1DWidth
-    cudaDevAttrMaxTexture2DWidth = mcDeviceAttribute_t.mcDeviceAttributeMaxTexture2DWidth
-    cudaDevAttrMaxTexture2DHeight = mcDeviceAttribute_t.mcDeviceAttributeMaxTexture2DHeight
-    cudaDevAttrMaxTexture3DWidth = mcDeviceAttribute_t.mcDeviceAttributeMaxTexture3DWidth
-    cudaDevAttrMaxTexture3DHeight = mcDeviceAttribute_t.mcDeviceAttributeMaxTexture3DHeight
-    cudaDevAttrMaxTexture3DDepth = mcDeviceAttribute_t.mcDeviceAttributeMaxTexture3DDepth
-    cudaDevAttrMaxTexture2DLayeredWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DLayeredHeight = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DLayeredLayers = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrSurfaceAlignment = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrConcurrentKernels = mcDeviceAttribute_t.mcDeviceAttributeConcurrentKernels
-    cudaDevAttrEccEnabled = mcDeviceAttribute_t.mcDeviceAttributeEccEnabled
-    cudaDevAttrPciBusId = mcDeviceAttribute_t.mcDeviceAttributePciBusId
-    cudaDevAttrPciDeviceId = mcDeviceAttribute_t.mcDeviceAttributePciDeviceId
-    cudaDevAttrTccDriver = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMemoryClockRate = mcDeviceAttribute_t.mcDeviceAttributeMemoryClockRate
-    cudaDevAttrGlobalMemoryBusWidth = mcDeviceAttribute_t.mcDeviceAttributeMemoryBusWidth
-    cudaDevAttrL2CacheSize = mcDeviceAttribute_t.mcDeviceAttributeL2CacheSize
-    cudaDevAttrMaxThreadsPerMultiProcessor = mcDeviceAttribute_t.mcDeviceAttributeMaxThreadsPerMultiProcessor
-    cudaDevAttrAsyncEngineCount = mcDeviceAttribute_t.mcDeviceAttributeAsyncEngineCount
-    cudaDevAttrUnifiedAddressing = mcDeviceAttribute_t.mcDeviceAttributeUnifiedAddressing
-    cudaDevAttrMaxTexture1DLayeredWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture1DLayeredLayers = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DGatherWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DGatherHeight = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture3DWidthAlt = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture3DHeightAlt = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture3DDepthAlt = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrPciDomainId = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrTexturePitchAlignment = mcDeviceAttribute_t.mcDeviceAttributeTexturePitchAlignment
-    cudaDevAttrMaxTextureCubemapWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTextureCubemapLayeredWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTextureCubemapLayeredLayers = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface1DWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface2DWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface2DHeight = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface3DWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface3DHeight = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface3DDepth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface1DLayeredWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface1DLayeredLayers = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface2DLayeredWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface2DLayeredHeight = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurface2DLayeredLayers = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurfaceCubemapWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurfaceCubemapLayeredWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSurfaceCubemapLayeredLayers = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture1DLinearWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DLinearWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DLinearHeight = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DLinearPitch = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DMipmappedWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTexture2DMipmappedHeight = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrComputeCapabilityMajor = mcDeviceAttribute_t.mcDeviceAttributeComputeCapabilityMajor
-    cudaDevAttrComputeCapabilityMinor = mcDeviceAttribute_t.mcDeviceAttributeComputeCapabilityMinor
-    cudaDevAttrMaxTexture1DMipmappedWidth = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrStreamPrioritiesSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrGlobalL1CacheSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrLocalL1CacheSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxSharedMemoryPerMultiprocessor = mcDeviceAttribute_t.mcDeviceAttributeMaxSharedMemoryPerMultiprocessor
-    cudaDevAttrMaxRegistersPerMultiprocessor = mcDeviceAttribute_t.mcDeviceAttributeMaxRegistersPerMultiprocessor
-    cudaDevAttrManagedMemory = mcDeviceAttribute_t.mcDeviceAttributeManagedMemory
-    cudaDevAttrIsMultiGpuBoard = mcDeviceAttribute_t.mcDeviceAttributeIsMultiGpuBoard
-    cudaDevAttrMultiGpuBoardGroupID = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrHostNativeAtomicSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrSingleToDoublePrecisionPerfRatio = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrPageableMemoryAccess = mcDeviceAttribute_t.mcDeviceAttributePageableMemoryAccess
-    cudaDevAttrConcurrentManagedAccess = mcDeviceAttribute_t.mcDeviceAttributeConcurrentManagedAccess
-    cudaDevAttrComputePreemptionSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrCanUseHostPointerForRegisteredMem = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrReserved92 = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrReserved93 = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrReserved94 = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrCooperativeLaunch = mcDeviceAttribute_t.mcDeviceAttributeCooperativeLaunch
-    cudaDevAttrCooperativeMultiDeviceLaunch = mcDeviceAttribute_t.mcDeviceAttributeCooperativeMultiDeviceLaunch
-    cudaDevAttrMaxSharedMemoryPerBlockOptin = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrCanFlushRemoteWrites = mcDeviceAttribute_t.mcDeviceAttributeCanFlushRemoteWrites
-    cudaDevAttrHostRegisterSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrPageableMemoryAccessUsesHostPageTables = mcDeviceAttribute_t.mcDeviceAttributePageableMemoryAccessUsesHostPageTables
-    cudaDevAttrDirectManagedMemAccessFromHost = mcDeviceAttribute_t.mcDeviceAttributeDirectManagedMemAccessFromHost
-    cudaDevAttrMaxBlocksPerMultiprocessor = mcDeviceAttribute_t.mcDevAttrMaxBlocksPerMultiprocessor
-    cudaDevAttrMaxPersistingL2CacheSize = mcDeviceAttribute_t.mcDeviceAttributeMaxPersistingL2CacheSize
-    cudaDevAttrMaxAccessPolicyWindowSize = mcDeviceAttribute_t.mcDeviceAttributeMaxAccessPolicyWindowSize
-    cudaDevAttrReservedSharedMemoryPerBlock = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrSparseCudaArraySupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrHostRegisterReadOnlySupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrTimelineSemaphoreInteropSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMaxTimelineSemaphoreInteropSupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMemoryPoolsSupported = mcDeviceAttribute_t.mcDeviceAttributeMemoryPoolsSupported
-    cudaDevAttrGPUDirectRDMASupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrGPUDirectRDMAFlushWritesOptions = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrGPUDirectRDMAWritesOrdering = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMemoryPoolSupportedHandleTypes = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrDeferredMappingCudaArraySupported = mcDeviceAttribute_t.mcDeviceAttributeUnknow
-    cudaDevAttrMax = mcDeviceAttribute_t.mcDeviceAttributeMax
+    cudaDevAttrMaxThreadsPerBlock = hcDeviceAttribute_t.hcDeviceAttributeMaxThreadsPerBlock
+    cudaDevAttrMaxBlockDimX = hcDeviceAttribute_t.hcDeviceAttributeMaxBlockDimX
+    cudaDevAttrMaxBlockDimY = hcDeviceAttribute_t.hcDeviceAttributeMaxBlockDimY
+    cudaDevAttrMaxBlockDimZ = hcDeviceAttribute_t.hcDeviceAttributeMaxBlockDimZ
+    cudaDevAttrMaxGridDimX = hcDeviceAttribute_t.hcDeviceAttributeMaxGridDimX
+    cudaDevAttrMaxGridDimY = hcDeviceAttribute_t.hcDeviceAttributeMaxGridDimY
+    cudaDevAttrMaxGridDimZ = hcDeviceAttribute_t.hcDeviceAttributeMaxGridDimZ
+    cudaDevAttrMaxSharedMemoryPerBlock = hcDeviceAttribute_t.hcDeviceAttributeMaxSharedMemoryPerBlock
+    cudaDevAttrTotalConstantMemory = hcDeviceAttribute_t.hcDeviceAttributeTotalConstantMemory
+    cudaDevAttrWarpSize = hcDeviceAttribute_t.hcDeviceAttributeWarpSize
+    cudaDevAttrMaxPitch = hcDeviceAttribute_t.hcDeviceAttributeMaxPitch
+    cudaDevAttrMaxRegistersPerBlock = hcDeviceAttribute_t.hcDeviceAttributeMaxRegistersPerBlock
+    cudaDevAttrClockRate = hcDeviceAttribute_t.hcDeviceAttributeClockRate
+    cudaDevAttrTextureAlignment = hcDeviceAttribute_t.hcDeviceAttributeTextureAlignment
+    cudaDevAttrGpuOverlap = hcDeviceAttribute_t.hcDeviceAttributeGpuOverlap
+    cudaDevAttrMultiProcessorCount = hcDeviceAttribute_t.hcDeviceAttributeMultiProcessorCount
+    cudaDevAttrKernelExecTimeout = hcDeviceAttribute_t.hcDeviceAttributeKernelExecTimeout
+    cudaDevAttrIntegrated = hcDeviceAttribute_t.hcDeviceAttributeIntegrated
+    cudaDevAttrCanMapHostMemory = hcDeviceAttribute_t.hcDeviceAttributeCanMapHostMemory
+    cudaDevAttrComputeMode = hcDeviceAttribute_t.hcDeviceAttributeComputeMode
+    cudaDevAttrMaxTexture1DWidth = hcDeviceAttribute_t.hcDeviceAttributeMaxTexture1DWidth
+    cudaDevAttrMaxTexture2DWidth = hcDeviceAttribute_t.hcDeviceAttributeMaxTexture2DWidth
+    cudaDevAttrMaxTexture2DHeight = hcDeviceAttribute_t.hcDeviceAttributeMaxTexture2DHeight
+    cudaDevAttrMaxTexture3DWidth = hcDeviceAttribute_t.hcDeviceAttributeMaxTexture3DWidth
+    cudaDevAttrMaxTexture3DHeight = hcDeviceAttribute_t.hcDeviceAttributeMaxTexture3DHeight
+    cudaDevAttrMaxTexture3DDepth = hcDeviceAttribute_t.hcDeviceAttributeMaxTexture3DDepth
+    cudaDevAttrMaxTexture2DLayeredWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DLayeredHeight = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DLayeredLayers = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrSurfaceAlignment = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrConcurrentKernels = hcDeviceAttribute_t.hcDeviceAttributeConcurrentKernels
+    cudaDevAttrEccEnabled = hcDeviceAttribute_t.hcDeviceAttributeEccEnabled
+    cudaDevAttrPciBusId = hcDeviceAttribute_t.hcDeviceAttributePciBusId
+    cudaDevAttrPciDeviceId = hcDeviceAttribute_t.hcDeviceAttributePciDeviceId
+    cudaDevAttrTccDriver = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMemoryClockRate = hcDeviceAttribute_t.hcDeviceAttributeMemoryClockRate
+    cudaDevAttrGlobalMemoryBusWidth = hcDeviceAttribute_t.hcDeviceAttributeMemoryBusWidth
+    cudaDevAttrL2CacheSize = hcDeviceAttribute_t.hcDeviceAttributeL2CacheSize
+    cudaDevAttrMaxThreadsPerMultiProcessor = hcDeviceAttribute_t.hcDeviceAttributeMaxThreadsPerMultiProcessor
+    cudaDevAttrAsyncEngineCount = hcDeviceAttribute_t.hcDeviceAttributeAsyncEngineCount
+    cudaDevAttrUnifiedAddressing = hcDeviceAttribute_t.hcDeviceAttributeUnifiedAddressing
+    cudaDevAttrMaxTexture1DLayeredWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture1DLayeredLayers = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DGatherWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DGatherHeight = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture3DWidthAlt = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture3DHeightAlt = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture3DDepthAlt = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrPciDomainId = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrTexturePitchAlignment = hcDeviceAttribute_t.hcDeviceAttributeTexturePitchAlignment
+    cudaDevAttrMaxTextureCubemapWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTextureCubemapLayeredWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTextureCubemapLayeredLayers = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface1DWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface2DWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface2DHeight = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface3DWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface3DHeight = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface3DDepth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface1DLayeredWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface1DLayeredLayers = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface2DLayeredWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface2DLayeredHeight = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurface2DLayeredLayers = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurfaceCubemapWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurfaceCubemapLayeredWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSurfaceCubemapLayeredLayers = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture1DLinearWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DLinearWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DLinearHeight = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DLinearPitch = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DMipmappedWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTexture2DMipmappedHeight = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrComputeCapabilityMajor = hcDeviceAttribute_t.hcDeviceAttributeComputeCapabilityMajor
+    cudaDevAttrComputeCapabilityMinor = hcDeviceAttribute_t.hcDeviceAttributeComputeCapabilityMinor
+    cudaDevAttrMaxTexture1DMipmappedWidth = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrStreamPrioritiesSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrGlobalL1CacheSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrLocalL1CacheSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxSharedMemoryPerMultiprocessor = hcDeviceAttribute_t.hcDeviceAttributeMaxSharedMemoryPerMultiprocessor
+    cudaDevAttrMaxRegistersPerMultiprocessor = hcDeviceAttribute_t.hcDeviceAttributeMaxRegistersPerMultiprocessor
+    cudaDevAttrManagedMemory = hcDeviceAttribute_t.hcDeviceAttributeManagedMemory
+    cudaDevAttrIsMultiGpuBoard = hcDeviceAttribute_t.hcDeviceAttributeIsMultiGpuBoard
+    cudaDevAttrMultiGpuBoardGroupID = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrHostNativeAtomicSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrSingleToDoublePrecisionPerfRatio = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrPageableMemoryAccess = hcDeviceAttribute_t.hcDeviceAttributePageableMemoryAccess
+    cudaDevAttrConcurrentManagedAccess = hcDeviceAttribute_t.hcDeviceAttributeConcurrentManagedAccess
+    cudaDevAttrComputePreemptionSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrCanUseHostPointerForRegisteredMem = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrReserved92 = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrReserved93 = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrReserved94 = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrCooperativeLaunch = hcDeviceAttribute_t.hcDeviceAttributeCooperativeLaunch
+    cudaDevAttrCooperativeMultiDeviceLaunch = hcDeviceAttribute_t.hcDeviceAttributeCooperativeMultiDeviceLaunch
+    cudaDevAttrMaxSharedMemoryPerBlockOptin = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrCanFlushRemoteWrites = hcDeviceAttribute_t.hcDeviceAttributeCanFlushRemoteWrites
+    cudaDevAttrHostRegisterSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrPageableMemoryAccessUsesHostPageTables = hcDeviceAttribute_t.hcDeviceAttributePageableMemoryAccessUsesHostPageTables
+    cudaDevAttrDirectManagedMemAccessFromHost = hcDeviceAttribute_t.hcDeviceAttributeDirectManagedMemAccessFromHost
+    cudaDevAttrMaxBlocksPerMultiprocessor = hcDeviceAttribute_t.hcDevAttrMaxBlocksPerMultiprocessor
+    cudaDevAttrMaxPersistingL2CacheSize = hcDeviceAttribute_t.hcDeviceAttributeMaxPersistingL2CacheSize
+    cudaDevAttrMaxAccessPolicyWindowSize = hcDeviceAttribute_t.hcDeviceAttributeMaxAccessPolicyWindowSize
+    cudaDevAttrReservedSharedMemoryPerBlock = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrSparseCudaArraySupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrHostRegisterReadOnlySupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrTimelineSemaphoreInteropSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMaxTimelineSemaphoreInteropSupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMemoryPoolsSupported = hcDeviceAttribute_t.hcDeviceAttributeMemoryPoolsSupported
+    cudaDevAttrGPUDirectRDMASupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrGPUDirectRDMAFlushWritesOptions = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrGPUDirectRDMAWritesOrdering = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMemoryPoolSupportedHandleTypes = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrDeferredMappingCudaArraySupported = hcDeviceAttribute_t.hcDeviceAttributeUnknow
+    cudaDevAttrMax = hcDeviceAttribute_t.hcDeviceAttributeMax
 
 
 
-cdef enum mcLimit_t:
-    mcLimitStackSize      # stack size in bytes of each GPU thread;
-    mcLimitPrintfFifoSize # size in bytes of the shared FIFO used by the printf() device system
+cdef enum hcLimit_t:
+    hcLimitStackSize      # stack size in bytes of each GPU thread;
+    hcLimitPrintfFifoSize # size in bytes of the shared FIFO used by the printf() device system
                            # call.
-    mcLimitMallocHeapSize # size in bytes of the heap used by the malloc() and free() device
+    hcLimitMallocHeapSize # size in bytes of the heap used by the malloc() and free() device
                            # system calls;
-    mcLimitDevRuntimeSyncDepth # maximum grid depth at which a thread can isssue the device
-                                # runtime call mcDeviceSynchronize() to wait on child grid
+    hcLimitDevRuntimeSyncDepth # maximum grid depth at which a thread can isssue the device
+                                # runtime call hcDeviceSynchronize() to wait on child grid
                                 # launches to complete.
-    mcLimitDevRuntimePendingLaunchCount # maximum number of outstanding device runtime launches.
-    mcLimitMaxL2FetchGranularity        # L2 cache fetch granularity.
-    mcLimitPersistingL2CacheSize        # Persisting L2 cache size in bytes
-    mcLimitMax
+    hcLimitDevRuntimePendingLaunchCount # maximum number of outstanding device runtime launches.
+    hcLimitMaxL2FetchGranularity        # L2 cache fetch granularity.
+    hcLimitPersistingL2CacheSize        # Persisting L2 cache size in bytes
+    hcLimitMax
 
 
 cpdef enum cudaLimit:
-    cudaLimitMallocHeapSize = mcLimit_t.mcLimitMallocHeapSize
+    cudaLimitMallocHeapSize = hcLimit_t.hcLimitMallocHeapSize

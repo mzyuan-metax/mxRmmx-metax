@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rmmx._cuda.runtime cimport mcStream_t
+from rmmx._cuda.runtime cimport hcStream_t
 from libc.stdint cimport uintptr_t
 from libcpp cimport bool
 
@@ -20,11 +20,11 @@ from rmmx._lib.cuda_stream_view cimport cuda_stream_view
 
 
 cdef class Stream:
-    cdef mcStream_t _cuda_stream
+    cdef hcStream_t _cuda_stream
     cdef object _owner
 
     @staticmethod
-    cdef Stream _from_cudaStream_t(mcStream_t s, object owner=*)
+    cdef Stream _from_cudaStream_t(hcStream_t s, object owner=*)
 
     cdef cuda_stream_view view(self) nogil except *
     cdef void c_synchronize(self) nogil except *

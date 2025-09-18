@@ -30,7 +30,7 @@
 
 namespace rmm {
 
-#ifdef MGPU_BUILD
+#ifdef HGPU_BUILD
   using par_t         = decltype(thrust::mc::par(*(new rmm::mr::thrust_allocator<char>())));
 #else
   using par_t         = decltype(thrust::cuda::par(*(new rmm::mr::thrust_allocator<char>())));

@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rmmx._cuda.runtime cimport mcStream_t
+from rmmx._cuda.runtime cimport hcStream_t
 from libcpp cimport bool
 
 
 cdef extern from "rmm/cuda_stream_view.hpp" namespace "rmm" nogil:
     cdef cppclass cuda_stream_view:
         cuda_stream_view()
-        cuda_stream_view(mcStream_t)
-        mcStream_t value()
+        cuda_stream_view(hcStream_t)
+        hcStream_t value()
         bool is_default()
         bool is_per_thread_default()
         void synchronize() except +
