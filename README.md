@@ -1,3 +1,8 @@
+# Build ON HPCC
+
+please see [build on hpcc](BUILDHPCC.md)
+
+---
 # <div align="left"><img src="img/rapids_logo.png" width="90px"/>&nbsp;RMM: RAPIDS Memory Manager</div>
 
 **NOTE:** For the latest stable [README.md](https://github.com/rapidsai/rmm/blob/main/README.md) ensure you are on the `main` branch.

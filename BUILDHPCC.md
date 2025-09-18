@@ -120,21 +120,21 @@ export LD_LIBRARY_PATH=/opt/conda/lib/:${LD_LIBRARY_PATH}
 7.3 GPU Status
 
 ```
-mx-smi  version: 2.2.6
+ht-smi  version: 2.2.4
 
-=================== MetaX System Management Interface Log ===================
-Timestamp                                         : Thu Sep 18 14:01:32 2025
+=================== Mars System Management Interface Log ===================
+Timestamp                                         : Thu Sep 18 17:12:24 2025
 
-Attached GPUs                                     : 1
+Attached GPUs                                     : 8
 +---------------------------------------------------------------------------------+
-| MX-SMI 2.2.6                        Kernel Mode Driver Version: 2.16.0          |
-| MACA Version: 3.0.0.8               BIOS Version: 1.26.1.0                      |
+| HT-SMI 2.2.4                        Kernel Mode Driver Version: 2.15.9          |
+| HPCC Version: 2.33.0.12             BIOS Version: 1.25.1.0                      |
 |------------------------------------+---------------------+----------------------+
-| GPU     NAME         Persistence-M | Bus-id              | GPU-Util      sGPU-M |
-| Temp    Pwr:Usage/Cap         Perf | Memory-Usage        | GPU-State            |
+| GPU         NAME                   | Bus-id              | GPU-Util             |
+| Temp        Pwr:Usage/Cap          | Memory-Usage        | GPU-State            |
 |====================================+=====================+======================|
-| 0       MetaX C500             Off | 0000:38:00.0        | 0%            Native |
-| 44C     71W / 350W              P9 | 986/65536 MiB       | Available            |
+| 0           Mars X201              | 0000:1b:00.0        | 0%                   |
+| 43C         78W / 350W             | 831/65536 MiB       | Available            |
 +------------------------------------+---------------------+----------------------+
 
 +---------------------------------------------------------------------------------+
@@ -142,7 +142,8 @@ Attached GPUs                                     : 1
 |  GPU                    PID         Process Name                 GPU Memory     |
 |                                                                  Usage(MiB)     |
 |=================================================================================|
-|  0                     2477         python                       128            |
+|  0                  3023806         python                       4              |
 +---------------------------------------------------------------------------------+
+
 
 ```
